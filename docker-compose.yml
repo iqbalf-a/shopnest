@@ -1,0 +1,32 @@
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: shopnest-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: shopnest
+      POSTGRES_PASSWORD: shopnest123
+      POSTGRES_DB: shopnest_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - shopnest-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shopnest -d shopnest_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  shopnest-network:
+    driver: bridge
+    name: shopnest-network
+
+volumes:
+  postgres_data:
+    name: shopnest-postgres-data
+  pgadmin_data:
+    name: shopnest-pgadmin-data

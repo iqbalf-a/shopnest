@@ -1,0 +1,10 @@
+# Sensitive config
+**/application-local.properties
+.env
+
+# Build
+**/target/
+
+# IDE
+**/.idea/
+**/*.iml
