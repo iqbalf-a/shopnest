@@ -2,6 +2,10 @@
 **/application-local.properties
 .env
 
+# Downloaded starters
+spring-starter/
+*.zip
+
 # Build
 **/target/
 
