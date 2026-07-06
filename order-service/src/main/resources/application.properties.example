@@ -1,0 +1,24 @@
+# Application
+spring.application.name=order-service
+server.port=8084
+server.forward-headers-strategy=framework
+
+# Database
+spring.datasource.url=jdbc:postgresql://your-db-host:5432/your-db-name?sslmode=require
+spring.datasource.username=your-username
+spring.datasource.password=your-password
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# JPA / Hibernate
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.default_schema=public
+spring.jpa.open-in-view=false
+
+# Eureka
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
+
+# Actuator
+management.endpoints.web.exposure.include=health,info
+management.endpoint.health.show-details=always
