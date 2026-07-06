@@ -4,6 +4,7 @@ import com.shopnest.productservice.dto.request.ProductRequest;
 import com.shopnest.productservice.dto.response.PageResponse;
 import com.shopnest.productservice.dto.response.ProductResponse;
 import com.shopnest.productservice.entity.Product;
+import com.shopnest.productservice.exception.InsufficientStockException;
 import com.shopnest.productservice.exception.ProductNotFoundException;
 import com.shopnest.productservice.repository.ProductRepository;
 import com.shopnest.productservice.service.ProductService;
@@ -84,6 +85,23 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public void deleteProduct(UUID id) {
         productRepository.delete(findProductOrThrow(id));
+    }
+
+    @Override
+    @Transactional
+    public ProductResponse reduceStock(UUID id, int quantity) {
+        Product product = findProductOrThrow(id);
+
+        if (product.getStock() < quantity) {
+            throw new InsufficientStockException(
+                    "Insufficient stock for product " + product.getName()
+                            + ": available " + product.getStock() + ", requested " + quantity);
+        }
+
+        product.setStock(product.getStock() - quantity);
+        productRepository.save(product);
+
+        return toResponse(product);
     }
 
     private Product findProductOrThrow(UUID id) {
