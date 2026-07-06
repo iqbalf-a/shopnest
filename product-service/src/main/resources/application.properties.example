@@ -1,6 +1,7 @@
 # Application
 spring.application.name=product-service
 server.port=8083
+server.forward-headers-strategy=framework
 
 # Database
 spring.datasource.url=jdbc:postgresql://your-db-host:5432/your-db-name?sslmode=require
