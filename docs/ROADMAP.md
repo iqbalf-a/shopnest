@@ -39,31 +39,7 @@ Goal: today every non-auth endpoint is wide open. Enforce JWT **once**, at the f
 
 ---
 
-## Phase 2 — Testing
-
-Goal: cover the testing pyramid from the original architecture diagram.
-
-- [ ] Unit tests — service layer with Mockito (`@Mock` repository/Feign client)
-- [ ] Controller tests — `MockMvc` + `@WebMvcTest` (+ mocked service)
-- [ ] Repository tests — `@DataJpaTest` with H2 in-memory
-- [ ] Integration test — `@SpringBootTest` happy path per service
-- [ ] Feign error paths — order-service behavior when product-service returns 404/409/down
-
-**Concepts:** test pyramid, mocking, test slices, H2
-
----
-
-## Phase 3 — Resilience & Observability (optional but strong for portfolio)
-
-- [ ] Resilience4j circuit breaker + fallback on order → product Feign calls
-- [ ] Micrometer + Zipkin — distributed tracing across gateway → order → product
-- [ ] Redis cache — product detail caching (`@Cacheable`)
-
-**Concepts:** circuit breaker, graceful degradation, tracing, caching
-
----
-
-## Phase 4 — Docker (dedicated learning phase)
+## Phase 2 — Docker (dedicated learning phase)
 
 Goal: everything runs with one `docker compose up`.
 
@@ -78,7 +54,7 @@ Goal: everything runs with one `docker compose up`.
 
 ---
 
-## Phase 5 — Deploy to Railway
+## Phase 3 — Deploy to Railway 🚀
 
 - [ ] Railway project — one service per container, PostgreSQL addon
 - [ ] Only gateway exposed publicly; services internal
@@ -89,19 +65,40 @@ Goal: everything runs with one `docker compose up`.
 
 ---
 
-## Phase 6 — Portfolio Polish
+## Phase 4 — Testing (deliberately after public deploy)
+
+Scoped down to essentials; postponed so the public demo ships first.
+
+- [ ] Unit tests — service layer with Mockito (`@Mock` repository/Feign client), happy path + 1–2 error cases per service
+- [ ] Feign error paths — order-service behavior when product-service returns 404/409/down
+- [ ] (Stretch) `MockMvc` controller tests
+
+**Concepts:** test pyramid, mocking
+
+---
+
+## Phase 5 — Portfolio Polish
 
 - [ ] Root `README.md` — architecture diagram, stack, run instructions, live demo link
 - [ ] `@Operation` / `@Schema` annotations — human descriptions + realistic examples in docs
 - [ ] Refresh `docs/public.sql` (current schema export)
 - [ ] Seed data script for demo
-- [ ] (Stretch) Saga-style stock restore on order cancel — talking point: distributed transactions
 
 ---
 
-## Known deliberate simplifications
+## Descoped (was in the original architecture diagram)
 
-Documented trade-offs — good interview talking points:
+Removed from scope to keep the project fundamental and focused. Each is a known
+"next step" and a good interview talking point:
+
+| Item | Why descoped | Would solve |
+|---|---|---|
+| Resilience4j circuit breaker | advanced; Feign error handling covers the basics | graceful degradation when product-service is down |
+| Micrometer + Zipkin tracing | observability is a chapter of its own | tracing one request across services |
+| Redis cache | optimization, not fundamentals | product read performance |
+| Maildev SMTP | notification-service no longer planned | email notifications |
+
+## Known deliberate simplifications
 
 | Simplification | Proper solution (not yet implemented) |
 |---|---|
