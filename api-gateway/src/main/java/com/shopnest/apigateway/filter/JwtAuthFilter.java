@@ -46,8 +46,9 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
         }
 
         // 2. Wajib ada "Authorization: Bearer <token>"
+        // scheme case-insensitive sesuai RFC 7235 (Bearer/bearer/BEARER sama saja)
         String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.toLowerCase().startsWith("bearer ")) {
             return unauthorized(exchange, "Missing or invalid Authorization header");
         }
 
