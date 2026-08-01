@@ -24,24 +24,25 @@ E-commerce microservices REST API — built for learning Spring Boot, Spring Clo
 
 ---
 
-## Phase 1 — Security: JWT at the Gateway ← NEXT
+## Phase 1 — Security: JWT at the Gateway ✅ DONE
 
-Goal: today every non-auth endpoint is wide open. Enforce JWT **once**, at the front door.
+Verified end-to-end via Scalar (2026-08-01): no token → 401, valid token → 200 with identity from claims.
 
-- [ ] Auth: add `userId` claim to generated JWT (`JwtService`)
-- [ ] Gateway: add `jjwt` dependency
-- [ ] Gateway: `JwtAuthFilter` implements `GlobalFilter`
+- [x] Auth: add `userId` claim to generated JWT (`JwtService`)
+- [x] Gateway: add `jjwt` dependency
+- [x] Gateway: `JwtAuthFilter` implements `GlobalFilter`
   - Public paths: `/api/auth/**`, `/docs/specs/**`
   - No/invalid/expired token → `401` before reaching any service
   - Valid token → forward `X-User-Id`, `X-User-Email`, `X-User-Role` headers
-- [ ] Gateway: `jwt.secret` → gitignore gateway `application.properties` + add `.example`
-- [ ] Services: read `X-User-Id` header instead of trusting `userId` from request body
+  - Bearer scheme case-insensitive (RFC 7235)
+- [x] Gateway: `jwt.secret` → gitignore gateway `application.properties` + add `.example`
+- [x] Services: read `X-User-Id` header instead of trusting `userId` from request body
 
 **Concepts:** perimeter security, GlobalFilter (WebFlux), claims propagation
 
 ---
 
-## Phase 2 — Docker
+## Phase 2 — Docker ← NEXT
 
 Goal: everything runs with one `docker compose up`.
 
