@@ -58,8 +58,8 @@ public class ProductController {
         return ResponseEntity.ok(ApiResponse.success("Product deleted", null));
     }
 
-    // Dipanggil order-service via Feign saat checkout
-    @PatchMapping("/{id}/stock/reduce")
+    // Dipanggil order-service via Feign saat checkout (POST: aksi non-idempotent)
+    @PostMapping("/{id}/stock/reduce")
     public ResponseEntity<ApiResponse<ProductResponse>> reduceStock(@PathVariable UUID id,
                                                                     @RequestParam int quantity) {
         ProductResponse response = productService.reduceStock(id, quantity);
