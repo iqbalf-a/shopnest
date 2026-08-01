@@ -5,6 +5,9 @@ server.port=8080
 # Eureka - gateway juga daftar ke eureka + tanya alamat service dari sini
 eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
 
+# JWT - harus SAMA dengan jwt.secret auth-service (untuk verifikasi signature token)
+jwt.secret=your-base64-encoded-secret-min-32-chars
+
 # ===== ROUTING - BUSINESS =====
 # lb:// = load-balanced: tanya Eureka alamat service, bukan hardcode port
 
