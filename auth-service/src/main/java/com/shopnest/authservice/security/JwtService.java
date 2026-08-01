@@ -1,5 +1,6 @@
 package com.shopnest.authservice.security;
 
+import com.shopnest.authservice.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -31,6 +32,11 @@ public class JwtService {
         Map<String, Object> extractClaims = new HashMap<>();
         extractClaims.put("role", userDetails.getAuthorities()
                 .iterator().next().getAuthority());
+        // userId ikut dibawa token - gateway membacanya lalu meneruskan
+        // ke service sebagai header X-User-Id
+        if (userDetails instanceof User user) {
+            extractClaims.put("userId", user.getId().toString());
+        }
         return buildToken(extractClaims, userDetails, jwtExpiration);
     }
 
