@@ -31,7 +31,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderResponse createOrder(OrderRequest request) {
+    public OrderResponse createOrder(UUID userId, OrderRequest request) {
 
         // FASE 1: validasi semua item dulu via Feign (produk ada? stok cukup?)
         // Kalau ada yang gagal, exception dilempar SEBELUM ada stok yang dipotong.
@@ -43,7 +43,7 @@ public class OrderServiceImpl implements OrderService {
 
         // FASE 2: kurangi stok di product-service + bangun order (snapshot nama & harga)
         Order order = Order.builder()
-                .userId(request.getUserId())
+                .userId(userId)
                 .status(OrderStatus.PENDING)
                 .totalAmount(BigDecimal.ZERO)
                 .build();

@@ -20,9 +20,11 @@ public class OrderController {
 
     private final OrderService orderService;
 
+    // X-User-Id diisi gateway dari JWT - bukan dari client langsung
     @PostMapping
-    public ResponseEntity<ApiResponse<OrderResponse>> createOrder(@Valid @RequestBody OrderRequest request) {
-        OrderResponse response = orderService.createOrder(request);
+    public ResponseEntity<ApiResponse<OrderResponse>> createOrder(@RequestHeader("X-User-Id") UUID userId,
+                                                                  @Valid @RequestBody OrderRequest request) {
+        OrderResponse response = orderService.createOrder(userId, request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Order created", response));
     }
@@ -33,8 +35,9 @@ public class OrderController {
         return ResponseEntity.ok(ApiResponse.success("Order found", response));
     }
 
+    // "pesanan SAYA" - identitas dari token, bukan query param
     @GetMapping
-    public ResponseEntity<ApiResponse<List<OrderResponse>>> getOrdersByUser(@RequestParam UUID userId) {
+    public ResponseEntity<ApiResponse<List<OrderResponse>>> getOrdersByUser(@RequestHeader("X-User-Id") UUID userId) {
         List<OrderResponse> response = orderService.getOrdersByUserId(userId);
         return ResponseEntity.ok(ApiResponse.success("Orders found", response));
     }

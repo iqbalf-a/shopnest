@@ -28,13 +28,13 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Override
     @Transactional
-    public ProfileResponse createProfile(ProfileRequest request) {
-        if (profileRepository.existsByUserId(request.getUserId())) {
-            throw new ProfileAlreadyExistsException("Profile already exists for user: " + request.getUserId());
+    public ProfileResponse createProfile(UUID userId, ProfileRequest request) {
+        if (profileRepository.existsByUserId(userId)) {
+            throw new ProfileAlreadyExistsException("Profile already exists for user: " + userId);
         }
 
         UserProfile profile = UserProfile.builder()
-                .userId(request.getUserId())
+                .userId(userId)
                 .fullName(request.getFullName())
                 .phoneNumber(request.getPhoneNumber())
                 .birthDate(request.getBirthDate())

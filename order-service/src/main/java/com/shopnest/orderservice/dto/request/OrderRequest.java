@@ -2,17 +2,15 @@ package com.shopnest.orderservice.dto.request;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.List;
-import java.util.UUID;
 
 @Data
 public class OrderRequest {
 
-    @NotNull(message = "User ID is required")
-    private UUID userId;
+    // userId TIDAK diterima dari body - identitas datang dari header X-User-Id
+    // yang diisi gateway setelah verifikasi JWT (client tidak bisa memalsukan)
 
     @NotEmpty(message = "Order must contain at least one item")
     @Valid

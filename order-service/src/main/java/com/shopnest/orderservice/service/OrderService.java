@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface OrderService {
 
-    OrderResponse createOrder(OrderRequest request);
+    OrderResponse createOrder(UUID userId, OrderRequest request);
 
     OrderResponse getOrderById(UUID id);
 

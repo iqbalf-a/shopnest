@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface UserProfileService {
 
-    ProfileResponse createProfile(ProfileRequest request);
+    ProfileResponse createProfile(UUID userId, ProfileRequest request);
 
     ProfileResponse getProfileByUserId(UUID userId);
 

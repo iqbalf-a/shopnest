@@ -1,17 +1,15 @@
 package com.shopnest.userservice.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 @Data
 public class ProfileRequest {
 
-    @NotNull(message = "User ID is required")
-    private UUID userId;
+    // userId TIDAK diterima dari body - identitas datang dari header X-User-Id
+    // yang diisi gateway setelah verifikasi JWT (client tidak bisa memalsukan)
 
     @NotBlank(message = "Full name is required")
     private String fullName;

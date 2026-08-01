@@ -22,9 +22,11 @@ public class UserProfileController {
 
     private final UserProfileService userProfileService;
 
+    // X-User-Id diisi gateway dari JWT - bukan dari client langsung
     @PostMapping
-    public ResponseEntity<ApiResponse<ProfileResponse>> createProfile(@Valid @RequestBody ProfileRequest request) {
-        ProfileResponse response = userProfileService.createProfile(request);
+    public ResponseEntity<ApiResponse<ProfileResponse>> createProfile(@RequestHeader("X-User-Id") UUID userId,
+                                                                      @Valid @RequestBody ProfileRequest request) {
+        ProfileResponse response = userProfileService.createProfile(userId, request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Profile created", response));
     }
