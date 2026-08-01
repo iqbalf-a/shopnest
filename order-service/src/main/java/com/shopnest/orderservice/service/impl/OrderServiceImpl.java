@@ -77,12 +77,16 @@ public class OrderServiceImpl implements OrderService {
         return toResponse(order);
     }
 
+    // @Transactional agar session tetap terbuka saat toResponse() mengakses
+    // order.getItems() yang lazy (open-in-view sengaja dimatikan)
     @Override
+    @Transactional
     public OrderResponse getOrderById(UUID id) {
         return toResponse(findOrderOrThrow(id));
     }
 
     @Override
+    @Transactional
     public List<OrderResponse> getOrdersByUserId(UUID userId) {
         return orderRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
                 .map(this::toResponse)
