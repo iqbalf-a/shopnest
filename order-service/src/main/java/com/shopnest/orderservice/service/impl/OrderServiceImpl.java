@@ -53,7 +53,7 @@ public class OrderServiceImpl implements OrderService {
             OrderItemRequest itemReq = request.getItems().get(i);
             ProductResponse product = products.get(i);
 
-            // Feign: PATCH /api/products/{id}/stock/reduce (409 kalau stok kurang)
+            // Feign: POST /api/products/{id}/stock/reduce (409 kalau stok kurang)
             productClient.reduceStock(itemReq.getProductId(), itemReq.getQuantity());
 
             BigDecimal subtotal = product.getPrice().multiply(BigDecimal.valueOf(itemReq.getQuantity()));
