@@ -44,14 +44,19 @@ public class JwtService {
     }
 
     // ===== CEK token (verify) =====
+    // valid jika email cocok DAN token belum kadaluarsa
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        Claims claims = parseClaims(token);
-        boolean notExpired = claims.getExpiration().after(new Date());
-        return claims.getSubject().equals(userDetails.getUsername()) && notExpired;
+        String email = extractEmail(token);
+        return email.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
     public String extractEmail(String token) {
         return parseClaims(token).getSubject();
+    }
+
+    private boolean isTokenExpired(String token) {
+        Date expiration = parseClaims(token).getExpiration();
+        return expiration.before(new Date());
     }
 
     // Buka token jadi isinya (claims). Signature diverifikasi di sini -
