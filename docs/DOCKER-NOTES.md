@@ -26,6 +26,10 @@ Masalah yang diselesaikan:
 
 Poin penting network: di dalam Docker, `http://product-service:8083` (nama container = alamat), bukan `localhost:8083`.
 
+**1 image → banyak container** (scaling): image `product-service` bisa dijalankan 3x jadi 3 container di port beda. Ini yang bikin scaling & load balancing gampang.
+
+Gambaran akhir: `docker compose up` menyalakan postgres (+volume) + eureka + 5 service dalam 1 network; hanya `gateway:8080` yang dibuka ke luar, sisanya internal. Perubahan dari sekarang: Supabase→postgres container, 6 terminal→1 perintah, config hardcode→env var.
+
 ---
 
 ## Rencana Phase 2 (bertahap)
@@ -53,9 +57,14 @@ STAGE 1 (builder): JDK → copy kode → mvnw package → hasilkan .jar
 STAGE 2 (runtime): JRE → copy .jar dari stage 1 → java -jar
 ```
 
+**Trik cache:** copy `.mvn/`, `mvnw`, `pom.xml` DULU lalu `dependency:go-offline`, baru copy `src/`.
+Kalau kode berubah tapi pom tidak, Docker pakai cache download (build lebih cepat).
+Dockerfile pertama sudah dibuat: `eureka-server/Dockerfile`.
+
 ---
 
 ## Progress Log
 
 - 2026-08: Phase 0 (6 service) + Phase 1 (JWT gateway) selesai & terverifikasi. Mulai Phase 2.
 - Docker belum terpasang di mesin dev → perlu install Docker Desktop dulu sebelum build/run.
+- Mesin dev: Intel Core Ultra 9 185H, arsitektur AMD64/x64 → download Docker Desktop versi AMD64 (bukan ARM64). Catatan: "AMD64" = x86-64, dipakai semua CPU Intel & AMD modern; bukan berarti prosesor AMD.
