@@ -68,3 +68,5 @@ Dockerfile pertama sudah dibuat: `eureka-server/Dockerfile`.
 - 2026-08: Phase 0 (6 service) + Phase 1 (JWT gateway) selesai & terverifikasi. Mulai Phase 2.
 - Docker belum terpasang di mesin dev → perlu install Docker Desktop dulu sebelum build/run.
 - Mesin dev: Intel Core Ultra 9 185H, arsitektur AMD64/x64 → download Docker Desktop versi AMD64 (bukan ARM64). Catatan: "AMD64" = x86-64, dipakai semua CPU Intel & AMD modern; bukan berarti prosesor AMD.
+- Docker Desktop v29.7.2 terpasang di `%LOCALAPPDATA%\Programs\DockerDesktop`. Terminal lama tidak melihat PATH-nya → di skrip pakai refresh PATH dari registry, atau tutup-buka VSCode.
+- Prasyarat Windows: Docker Desktop butuh WSL2. WSL belum ada → install manual di PowerShell ADMIN: `wsl --install`, lalu RESTART komputer. Sign-in Docker = opsional (Skip). Setelah restart baru daemon bisa "Engine running".
