@@ -1,7 +1,7 @@
 services:
 
   postgres:
-    image: postgres:16-alpine
+    image: postgres:16-alpine          # image resmi PostgreSQL, tidak perlu Dockerfile
     container_name: shopnest-postgres
     restart: unless-stopped
     environment:
@@ -9,24 +9,120 @@ services:
       POSTGRES_PASSWORD: shopnest123
       POSTGRES_DB: shopnest_db
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data   # data disimpan di volume (permanen)
     ports:
       - "5432:5432"
     networks:
       - shopnest-network
-    healthcheck:
+    healthcheck:                          # cek DB siap sebelum service connect
       test: ["CMD-SHELL", "pg_isready -U shopnest -d shopnest_db"]
       interval: 10s
       timeout: 5s
       retries: 5
 
+  eureka-server:
+    build: ./eureka-server               # build dari Dockerfile di folder itu
+    container_name: shopnest-eureka
+    restart: unless-stopped
+    ports:
+      - "8761:8761"                      # buka ke laptop (host:container)
+    networks:
+      - shopnest-network
+
+  auth-service:
+    build: ./auth-service
+    container_name: shopnest-auth
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: docker     # aktifkan application-docker.properties
+      DB_URL: jdbc:postgresql://postgres:5432/shopnest_db
+      DB_USER: shopnest
+      DB_PASSWORD: shopnest123
+      EUREKA_URL: http://eureka-server:8761/eureka/
+      JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    depends_on:
+      postgres:
+        condition: service_healthy       # tunggu DB siap
+      eureka-server:
+        condition: service_started
+    networks:
+      - shopnest-network
+
+  user-service:
+    build: ./user-service
+    container_name: shopnest-user
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_URL: jdbc:postgresql://postgres:5432/shopnest_db
+      DB_USER: shopnest
+      DB_PASSWORD: shopnest123
+      EUREKA_URL: http://eureka-server:8761/eureka/
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+    networks:
+      - shopnest-network
+
+  product-service:
+    build: ./product-service
+    container_name: shopnest-product
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_URL: jdbc:postgresql://postgres:5432/shopnest_db
+      DB_USER: shopnest
+      DB_PASSWORD: shopnest123
+      EUREKA_URL: http://eureka-server:8761/eureka/
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+    networks:
+      - shopnest-network
+
+  order-service:
+    build: ./order-service
+    container_name: shopnest-order
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_URL: jdbc:postgresql://postgres:5432/shopnest_db
+      DB_USER: shopnest
+      DB_PASSWORD: shopnest123
+      EUREKA_URL: http://eureka-server:8761/eureka/
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+    networks:
+      - shopnest-network
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: shopnest-gateway
+    restart: unless-stopped
+    ports:
+      - "8080:8080"                      # satu-satunya pintu ke luar untuk API
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_URL: http://eureka-server:8761/eureka/
+      JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    depends_on:
+      eureka-server:
+        condition: service_started
+    networks:
+      - shopnest-network
+
 networks:
-  shopnest-network:
+  shopnest-network:                      # 1 network privat untuk semua container
     driver: bridge
     name: shopnest-network
 
 volumes:
-  postgres_data:
+  postgres_data:                         # volume bernama, data DB tidak hilang saat container dihapus
     name: shopnest-postgres-data
-  pgadmin_data:
-    name: shopnest-pgadmin-data
