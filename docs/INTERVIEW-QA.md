@@ -169,7 +169,7 @@ Idealnya: distributed tracing (Zipkin/Jaeger + Micrometer) untuk melacak 1 reque
 Sistem terdistribusi hanya bisa menjamin 2 dari 3: Consistency, Availability, Partition tolerance. Karena partisi jaringan tak terhindarkan, praktiknya memilih antara C dan A. Microservices umumnya condong ke AP + eventual consistency.
 
 **Q: Bagaimana strategi deployment & scaling-nya?**
-Rencana: containerize (Docker) tiap service, deploy ke Railway. Scaling: jalankan beberapa instance service yang sibuk, Eureka + load balancer membagi beban. Di cloud production: Kubernetes untuk orchestration.
+Sudah containerize (Docker) tiap service, jalan penuh lewat `docker compose up`; deploy publik belum jadi fokus saat ini. Scaling: jalankan beberapa instance service yang sibuk, Eureka + load balancer membagi beban. Di cloud production: Kubernetes untuk orchestration.
 
 **Q: Bagaimana kamu testing project ini?**
 Rencana (Phase 4): unit test service layer dengan Mockito (mock repository & Feign client), fokus happy path + error case. Jujur: saat ini belum ada test — diprioritaskan setelah deploy. (Kalau ditanya, jangan mengaku sudah ada kalau belum.)

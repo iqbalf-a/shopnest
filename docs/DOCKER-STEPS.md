@@ -317,4 +317,3 @@ docker stats                  # pemakaian CPU/RAM tiap container
 
 ## Catatan lanjutan (2e, opsional nanti)
 - Healthcheck untuk service Spring butuh dependency `spring-boot-starter-actuator` (belum ada di user/product/order/gateway). Kalau ditambah, `depends_on` bisa pakai `service_healthy` untuk service, bukan cuma `service_started`.
-- Untuk deploy Railway (Phase 3): env var (DB, JWT) diisi dari dashboard Railway, bukan hardcode di compose.

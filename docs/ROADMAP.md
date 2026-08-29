@@ -1,6 +1,6 @@
 # ShopNest Roadmap
 
-E-commerce microservices REST API — built for learning Spring Boot, Spring Cloud, and Docker, and as a portfolio project. Deployment target: Docker containers on Railway.
+E-commerce microservices REST API — built for learning Spring Boot, Spring Cloud, and Docker, and as a portfolio project. Runs fully containerized locally via `docker compose up`; public deployment is not currently planned.
 
 **Legend:** `[x]` done · `[ ]` to do (fundamental) · ⏭️ **SKIP** = not fundamental, deliberately postponed
 
@@ -59,18 +59,15 @@ Goal: everything runs with one `docker compose up`. Achieved & verified end-to-e
 
 ---
 
-## Phase 3 — Deploy to Railway 🚀 ← NEXT
+## Phase 3 — Deploy Publik ⏭️ SKIP (fokus lokal)
 
-- [ ] Railway project — one service per container, PostgreSQL addon
-- [ ] Only gateway exposed publicly; services internal
-- [ ] Secrets via Railway environment variables
-- [ ] Verify Scalar docs on the public URL
+Sistem sudah full containerized & terverifikasi end-to-end via `docker compose up` — cukup sebagai bukti kemampuan Docker untuk portfolio. Deploy publik bukan prioritas saat ini; bisa disambung kapan saja nanti tanpa ubah kode kalau dibutuhkan.
 
-**Concepts:** PaaS deployment, environment parity, secret management
+**Concepts:** PaaS deployment, environment parity, secret management (belum dipraktikkan)
 
 ---
 
-## Phase 4 — Testing (deliberately after public deploy)
+## Phase 4 — Testing
 
 - [ ] Unit tests — service layer with Mockito, happy path + 1–2 error cases per service
 - [ ] Feign error paths — order-service when product-service returns 404/409/down
