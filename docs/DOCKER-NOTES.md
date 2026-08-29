@@ -36,9 +36,11 @@ Gambaran akhir: `docker compose up` menyalakan postgres (+volume) + eureka + 5 s
 
 - [x] 2a. Konsep Docker (catatan ini)
 - [x] 2b. Docker Desktop + Dockerfile eureka + build + run → Eureka hidup di container (localhost:8761) ✅
-- [ ] 2c. Tambah PostgreSQL container + volume + koneksikan 1 service
-- [ ] 2d. docker-compose: semua service jadi satu
-- [ ] 2e. Actuator dependency + healthcheck + depends_on (urutan startup)
+- [x] 2c+2d SELESAI (20 Agu 2026): 5 Dockerfile lagi + 5 application-docker.properties + docker-compose.yml lengkap (postgres+volume, eureka, auth, user, product, order, gateway, depends_on, network). `docker compose up --build -d` → 7 container Up, postgres healthy.
+- [x] Verifikasi end-to-end: 5 service terdaftar di Eureka, register→login→buat produk→checkout (Feign antar container)→stok berkurang→riwayat order, tanpa token=401. Schema per-service (auth_service/user_service/product_service/order_service) otomatis terbentuk di postgres container.
+- [ ] 2e (opsional, belum): actuator dependency + healthcheck Spring (masih pakai `service_started`, bukan `service_healthy`, untuk service Spring)
+
+**Gotcha:** gateway sempat 503 ~10 detik pertama setelah semua container Up — client-side Eureka cache gateway belum refresh walau server sudah tahu service baru. Normal, retry setelah beberapa detik.
 
 Prasyarat kode (dikerjakan di 2d/2e):
 - Tambah dependency `spring-boot-starter-actuator` di pom user/product/order/gateway (properties actuator sudah disiapkan, dependency belum). Untuk healthcheck Docker.

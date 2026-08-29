@@ -42,22 +42,24 @@ Verified end-to-end via Scalar (2026-08-01): no token → 401, valid token → 2
 
 ---
 
-## Phase 2 — Docker ← NEXT
+## Phase 2 — Docker ✅ DONE
 
-Goal: everything runs with one `docker compose up`.
+Goal: everything runs with one `docker compose up`. Achieved & verified end-to-end (2026-08-20).
 
-- [ ] Multi-stage `Dockerfile` per service (JDK build → JRE runtime)
-- [ ] `docker-compose.yml` — all apps + PostgreSQL container
-- [ ] Migrate dev DB: Supabase → containerized PostgreSQL
-- [ ] `depends_on` + healthchecks — startup ordering formalized
-- [ ] Environment-variable driven config (`application-docker.properties`)
+- [x] Multi-stage `Dockerfile` per service (JDK build → JRE runtime)
+- [x] `docker-compose.yml` — all 7 containers (postgres + eureka + 4 services + gateway)
+- [x] Migrate dev DB: Supabase → containerized PostgreSQL (schema-per-service auto-created)
+- [x] `depends_on` — startup ordering (postgres healthy → eureka → services → gateway)
+- [x] Environment-variable driven config (`application-docker.properties`, `${VAR}` placeholders)
 - ⏭️ **SKIP** Config Server reintroduction — env vars are the simpler, standard-enough answer
+- ⏭️ **SKIP (for now)** Spring actuator + `service_healthy` for app containers — currently `service_started`; works fine, actuator is a nice-to-have refinement
 
-**Concepts:** images vs containers, multi-stage builds, networks, volumes, healthchecks
+**Concepts:** images vs containers, multi-stage builds, networks, volumes, healthchecks, docker-compose
+**Verified:** register→login→create product→checkout (Feign across containers)→stock reduced→order history, no-token=401, 5 services registered in Eureka, 4 schemas auto-created in postgres container.
 
 ---
 
-## Phase 3 — Deploy to Railway 🚀
+## Phase 3 — Deploy to Railway 🚀 ← NEXT
 
 - [ ] Railway project — one service per container, PostgreSQL addon
 - [ ] Only gateway exposed publicly; services internal
