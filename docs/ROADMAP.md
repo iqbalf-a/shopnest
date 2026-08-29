@@ -67,13 +67,13 @@ Sistem sudah full containerized & terverifikasi end-to-end via `docker compose u
 
 ---
 
-## Phase 4 — Testing
+## Phase 4 — Testing ✅ DONE
 
-- [ ] Unit tests — service layer with Mockito, happy path + 1–2 error cases per service
-- [ ] Feign error paths — order-service when product-service returns 404/409/down
+- [x] Unit tests — service layer with Mockito, happy path + 1–2 error cases per service (auth, user, product, order)
+- [x] Feign error paths — order-service when product-service returns 404/409
 - ⏭️ **SKIP** `MockMvc` controller tests, `@DataJpaTest`/H2, `@SpringBootTest` — full pyramid later if wanted
 
-**Concepts:** mocking, test structure
+**Concepts:** mocking (`@Mock`/`@InjectMocks`), `MockitoExtension`, testing exception paths, Feign exception propagation
 
 ---
 
