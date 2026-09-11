@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Latar produk ShopNest — satu toko, bukan marketplace.">
+<style>:root{color-scheme:light dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Cerita ShopNest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --brand-700:#3A48D6; --brand-600:#4A5CF2; --brand-300:#B9C0FB;
+    --brand-100:#E4E7FE; --brand-50:#F3F4FE; --on-brand:#FFFFFF;
+    --ink:#1D1F27; --ink-2:#43464F; --muted:#767A86;
+    --line:#E6E7EE; --line-soft:#F0F1F5;
+    --ground:#FBFBFD; --surface:#FFFFFF; --surface-2:#F3F4F8;
+    --ok:#0F7E5A; --ok-soft:#E2F4EC;
+    --warn:#8F6100; --warn-soft:#FAEFDA;
+    --bad:#C2372E; --bad-soft:#FBE7E5;
+    --r-sm:5px; --r-md:9px; --r-lg:16px;
+    --f-ui:"Geist",system-ui,-apple-system,"Segoe UI",sans-serif;
+    --f-mono:"Geist Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --brand-700:#A9B3FF; --brand-600:#8E9AFB; --brand-300:#3B4483;
+      --brand-100:#242A52; --brand-50:#1C2040; --on-brand:#15161B;
+      --ink:#ECEDF2; --ink-2:#C7CAD4; --muted:#9AA0AE;
+      --line:#2F323C; --line-soft:#262932;
+      --ground:#15161B; --surface:#1C1E25; --surface-2:#24272F;
+      --ok:#55CC9C; --ok-soft:#153429;
+      --warn:#E0AC53; --warn-soft:#372911;
+      --bad:#EC8B82; --bad-soft:#3B231F;
+    }
+  }
+  :root[data-theme="dark"]{
+    --brand-700:#A9B3FF; --brand-600:#8E9AFB; --brand-300:#3B4483;
+    --brand-100:#242A52; --brand-50:#1C2040; --on-brand:#15161B;
+    --ink:#ECEDF2; --ink-2:#C7CAD4; --muted:#9AA0AE;
+    --line:#2F323C; --line-soft:#262932;
+    --ground:#15161B; --surface:#1C1E25; --surface-2:#24272F;
+    --ok:#55CC9C; --ok-soft:#153429;
+    --warn:#E0AC53; --warn-soft:#372911;
+    --bad:#EC8B82; --bad-soft:#3B231F;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--ground);color:var(--ink);
+    font-family:var(--f-ui);font-size:16px;line-height:1.72;letter-spacing:-.005em;
+    padding-block:0 80px;padding-left:22px;padding-right:22px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:820px;margin:0 auto}
+  .wide{max-width:1080px;margin:0 auto}
+  :focus-visible{outline:2px solid var(--brand-600);outline-offset:2px;border-radius:3px}
+
+  header.mast{padding-block:76px 0}
+  .kicker{
+    font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--muted);margin:0 0 22px;
+  }
+  h1{
+    font-weight:600;font-size:clamp(42px,7.4vw,72px);line-height:1.0;
+    letter-spacing:-.042em;margin:0;text-wrap:balance;
+  }
+  .stand{font-size:19px;color:var(--muted);margin:24px 0 0;line-height:1.6;max-width:60ch}
+  .stand b{color:var(--ink);font-weight:600}
+
+  section{padding-block:56px 0}
+  h2{
+    font-weight:600;font-size:clamp(25px,3.4vw,31px);letter-spacing:-.032em;
+    line-height:1.16;margin:0 0 10px;text-wrap:balance;
+  }
+  .eyebrow{
+    font-family:var(--f-mono);font-size:10.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--brand-700);display:block;margin-bottom:10px;
+  }
+  h3{font-weight:600;font-size:18px;letter-spacing:-.024em;margin:32px 0 8px}
+  p{margin:0 0 18px}
+  p:last-child{margin-bottom:0}
+  code{font-family:var(--f-mono);font-size:.84em;background:var(--surface-2);padding:2px 5px;border-radius:4px;word-break:break-word}
+  strong,b{font-weight:600}
+  .lede{color:var(--muted);font-size:17px;margin-bottom:24px}
+
+  /* pull quote */
+  .pull{
+    margin:34px 0;padding:26px 30px;background:var(--brand-50);
+    border-radius:var(--r-lg);font-size:20px;line-height:1.48;
+    letter-spacing:-.024em;font-weight:500;color:var(--ink);
+  }
+  .pull span{display:block;margin-top:12px;font-size:13px;font-weight:400;
+    letter-spacing:-.005em;color:var(--brand-700);line-height:1.5}
+
+  /* tables */
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface);margin-bottom:20px}
+  table{border-collapse:collapse;width:100%;min-width:600px;font-size:14px}
+  th,td{text-align:left;padding:14px 18px;border-bottom:1px solid var(--line-soft);vertical-align:top;line-height:1.58}
+  thead th{
+    font-family:var(--f-mono);font-size:10px;font-weight:500;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line);white-space:nowrap;
+  }
+  tbody tr:last-child td{border-bottom:0}
+  td.mono{font-family:var(--f-mono);font-size:12.5px}
+  td.verdict{font-weight:600;white-space:nowrap}
+
+  /* cards */
+  .grid{display:grid;gap:16px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px 26px}
+  .card h4{font-weight:600;font-size:16px;letter-spacing:-.024em;margin:0 0 2px}
+  .card .role{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--brand-700);display:block;margin-bottom:12px}
+  .card p{font-size:14.5px;color:var(--muted);line-height:1.62;margin:0 0 12px}
+  .card p:last-child{margin:0}
+  .card .says{color:var(--ink);font-weight:500;letter-spacing:-.018em}
+
+  /* numbered problems */
+  ol.probs{list-style:none;counter-reset:p;margin:0 0 20px;padding:0}
+  ol.probs li{
+    counter-increment:p;position:relative;padding:16px 0 16px 46px;
+    border-bottom:1px solid var(--line-soft);font-size:15.5px;line-height:1.62;
+  }
+  ol.probs li:last-child{border-bottom:0}
+  ol.probs li::before{
+    content:counter(p);position:absolute;left:0;top:17px;
+    width:26px;height:26px;border-radius:50%;background:var(--surface-2);
+    color:var(--muted);font-family:var(--f-mono);font-size:11.5px;
+    display:grid;place-items:center;
+  }
+  ol.probs li b{display:block;font-weight:600;letter-spacing:-.018em;margin-bottom:2px}
+
+  ul.plain{list-style:none;margin:0 0 20px;padding:0}
+  ul.plain li{padding:10px 0 10px 26px;position:relative;border-bottom:1px solid var(--line-soft);font-size:15px;line-height:1.62}
+  ul.plain li:last-child{border-bottom:0}
+  ul.plain li::before{content:"";position:absolute;left:4px;top:21px;width:5px;height:5px;border-radius:50%;background:var(--brand-300)}
+
+  .note{
+    border-radius:var(--r-lg);padding:22px 26px;margin:0 0 20px;background:var(--surface-2);
+  }
+  .note.honest{background:var(--warn-soft)}
+  .note .ttl{font-weight:600;font-size:14.5px;letter-spacing:-.022em;display:block;margin-bottom:8px;color:var(--ink-2)}
+  .note.honest .ttl{color:var(--warn)}
+  .note p{font-size:15px;margin:0 0 12px}
+  .note p:last-child{margin:0}
+
+  .readme{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+    padding:26px 28px;
+  }
+  .readme .lbl{
+    font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);display:block;margin-bottom:14px;
+  }
+  .readme p{font-size:15.5px;line-height:1.68}
+
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:20px 24px;margin:0 0 26px}
+  .fact dt{font-family:var(--f-mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);margin:0 0 3px}
+  .fact dd{margin:0;font-size:17px;font-weight:600;letter-spacing:-.024em;font-variant-numeric:tabular-nums}
+
+  footer{
+    margin-top:76px;padding-top:24px;border-top:1px solid var(--line);
+    font-family:var(--f-mono);font-size:11px;color:var(--muted);
+    display:flex;flex-wrap:wrap;gap:8px 24px;
+  }
+
+  @media (max-width:640px){
+    header.mast{padding-block:44px 0}
+    section{padding-block:42px 0}
+    body{font-size:15.5px}
+    .pull{font-size:17.5px;padding:22px 24px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<header class="mast">
+  <p class="kicker">Latar produk · ShopNest · 11 September 2026</p>
+  <h1>Cerita ShopNest</h1>
+  <p class="stand">Satu toko, satu gudang, dua orang yang mengurusnya. <b>Bukan marketplace</b> — dan itu bukan keputusan yang baru diambil sekarang, melainkan yang sudah tercetak di skema database sejak tabel pertama dibuat.</p>
+</header>
+
+<section>
+  <span class="eyebrow">Premis</span>
+  <h2>Usulanmu benar, dan kodenya sudah membuktikannya</h2>
+  <p class="lede">Pertanyaanmu — marketplace seperti Tokopedia terlalu luas, lebih baik satu toko saja — sebenarnya sudah dijawab oleh backend yang sudah jadi. Saya periksa skemanya, dan tidak ada satu pun jejak marketplace di sana.</p>
+
+  <div class="tbl-wrap wide">
+    <table>
+      <thead><tr><th>Kalau ini marketplace, harusnya ada…</th><th>Yang sebenarnya ada di kode</th><th>Kesimpulan</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Kolom penjual di tabel produk</td>
+          <td class="mono">products: id, name, description, price, stock, category — tidak ada seller_id</td>
+          <td class="verdict" style="color:var(--ok)">Satu penjual</td>
+        </tr>
+        <tr>
+          <td>Peran <code>SELLER</code> atau <code>MERCHANT</code></td>
+          <td class="mono">enum Role { USER, ADMIN }</td>
+          <td class="verdict" style="color:var(--ok)">Pengelola, bukan seller</td>
+        </tr>
+        <tr>
+          <td>Pemecahan pesanan per penjual</td>
+          <td class="mono">orders: satu order, satu total, satu daftar item</td>
+          <td class="verdict" style="color:var(--ok)">Satu keranjang, satu struk</td>
+        </tr>
+        <tr>
+          <td>Stok milik masing-masing penjual</td>
+          <td class="mono">hanya product-service yang punya endpoint ubah stok</td>
+          <td class="verdict" style="color:var(--ok)">Satu gudang</td>
+        </tr>
+        <tr>
+          <td>Komisi, payout, saldo penjual</td>
+          <td class="mono">tidak ada tabelnya sama sekali</td>
+          <td class="verdict" style="color:var(--ok)">Bukan perantara</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Jadi ini bukan soal mempersempit ruang lingkup supaya lebih gampang. Backend ini memang <b>tidak pernah</b> jadi marketplace. Menceritakannya sebagai "Tokopedia versi kecil" justru akan membuat orang mencari fitur yang tidak ada dan menyimpulkan proyeknya belum selesai — padahal yang terjadi adalah ceritanya salah, bukan kodenya.</p>
+
+  <div class="pull">
+    Satu toko yang berjualan sendiri, bukan pasar yang menyewakan lapak.
+    <span>Satu kalimat yang harus dipegang setiap kali ada pertanyaan "fitur ini masuk atau tidak?"</span>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">Tokonya</span>
+  <h2>ShopNest menjual isi rumah</h2>
+  <p>Namanya sudah memberi petunjuk: <em>nest</em> — sarang, rumah. ShopNest adalah toko perlengkapan rumah dan elektronik kecil: peralatan dapur, penyimpanan, penerangan, audio, kebersihan. Barang-barang yang dibeli orang saat baru pindah kos, baru menikah, atau sedang membenahi rumah sedikit demi sedikit.</p>
+  <p>Tokonya dimiliki satu usaha keluarga. Barang datang dari beberapa pemasok, tapi yang menjual ke pembeli cuma satu pihak: ShopNest sendiri. Tidak ada lapak orang lain di dalamnya.</p>
+
+  <dl class="facts">
+    <div class="fact"><dt>Jenis</dt><dd>Toko sendiri</dd></div>
+    <div class="fact"><dt>Gudang</dt><dd>1</dd></div>
+    <div class="fact"><dt>Kategori</dt><dd>6</dd></div>
+    <div class="fact"><dt>Katalog</dt><dd>±200 SKU</dd></div>
+    <div class="fact"><dt>Pesanan / hari</dt><dd>20–40</dd></div>
+    <div class="fact"><dt>Pengelola</dt><dd>2 admin</dd></div>
+  </dl>
+
+  <p>Skalanya sengaja dibuat masuk akal: cukup besar untuk benar-benar butuh sistem — dua ratus barang tidak bisa lagi diingat di kepala — tapi cukup kecil untuk diurus satu gudang dan dua orang. Itu ukuran yang membuat setiap keputusan di kode bisa dijelaskan tanpa mengarang kebutuhan perusahaan besar.</p>
+</section>
+
+<section>
+  <span class="eyebrow">Dua orang</span>
+  <h2>Siapa yang membuka layar ini setiap hari</h2>
+  <p class="lede">Seluruh sistem hanya melayani dua jenis orang — dan itu persis jumlah peran yang ada di <code>enum Role</code>.</p>
+
+  <div class="grid g2">
+    <div class="card">
+      <span class="role">USER · pembeli</span>
+      <h4>Rangga</h4>
+      <p>Baru pindah ke kos baru. Butuh teko listrik, lampu meja, dan rak susun — tidak sekaligus, tapi dicicil beberapa kali belanja dalam sebulan.</p>
+      <p class="says">"Saya cuma mau tahu barangnya masih ada atau tidak, dan harga yang saya lihat tadi itu yang saya bayar."</p>
+    </div>
+    <div class="card">
+      <span class="role">ADMIN · pengelola toko</span>
+      <h4>Sari</h4>
+      <p>Mengurus katalog: memasukkan barang baru, memperbarui harga saat pemasok naik, dan mengecek pesanan yang masuk pagi itu.</p>
+      <p class="says">"Kalau saya ubah harga hari ini, pesanan kemarin jangan ikut berubah. Itu sudah jadi struk."</p>
+    </div>
+  </div>
+
+  <p style="margin-top:20px">Perhatikan bahwa Sari bukan <em>seller</em> yang menyewa lapak — dia pegawai toko. Karena itu ADMIN di sistem ini punya kuasa penuh atas seluruh katalog, bukan cuma atas barang miliknya sendiri. Di marketplace, model izin seperti itu justru salah.</p>
+</section>
+
+<section>
+  <span class="eyebrow">Sebelum ada sistem</span>
+  <h2>Empat masalah yang melahirkan ShopNest</h2>
+  <p class="lede">Sebelum ini, ShopNest berjualan lewat DM Instagram dan WhatsApp, dengan satu spreadsheet bersama sebagai catatan. Empat hal berikut yang akhirnya memaksa mereka pindah ke sistem sendiri.</p>
+
+  <ol class="probs">
+    <li><b>Barang terjual dua kali</b>Sari dan rekannya membuka sheet yang sama di jam yang sama. Dua pembeli dijanjikan teko terakhir, satu harus dibatalkan dan diminta maaf.</li>
+    <li><b>Harga berubah, pembeli pegang tangkapan layar lama</b>Harga di sheet diperbarui saat pemasok naik. Pembeli yang menanyakan kemarin datang membawa screenshot harga lama, dan tidak ada yang bisa memutuskan siapa yang benar.</li>
+    <li><b>Riwayat pesanan hilang di dalam chat</b>"Bulan lalu saya beli apa saja?" berarti menggulir percakapan berminggu-minggu ke belakang. Untuk pembeli maupun untuk toko.</li>
+    <li><b>Siapa boleh mengubah apa tidak jelas</b>Semua orang yang punya tautan sheet bisa mengubah stok dan harga, dan tidak ada jejak siapa mengubah apa.</li>
+  </ol>
+</section>
+
+<section>
+  <span class="eyebrow">Cerita bertemu kode</span>
+  <h2>Setiap masalah punya jawabannya di dalam repo</h2>
+  <p class="lede">Bagian ini yang membuat cerita di atas bukan hiasan. Empat masalah tadi bukan dikarang belakangan agar cocok — keempatnya menunjuk ke keputusan teknis yang memang sudah ada di kode.</p>
+
+  <div class="tbl-wrap wide">
+    <table>
+      <thead><tr><th>Masalah</th><th>Jawaban di dalam kode</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><b>Barang terjual dua kali</b></td>
+          <td>Stok hanya boleh disentuh product-service. Saat checkout, order-service tidak menulis ke tabel produk — ia memanggil <code>POST /api/products/{id}/stock/reduce</code> lewat Feign. Satu pintu, satu penjaga.</td>
+        </tr>
+        <tr>
+          <td><b>Harga basi</b></td>
+          <td><code>order_items</code> menyimpan <code>product_name</code> dan <code>price</code> sebagai <b>salinan saat pesanan dibuat</b>, bukan referensi ke katalog. Sari boleh menaikkan harga besok; struk Rangga tidak ikut berubah.</td>
+        </tr>
+        <tr>
+          <td><b>Riwayat hilang</b></td>
+          <td><code>GET /api/orders</code> mengembalikan pesanan milik pengguna yang sedang login, terbaru dulu — <code>findByUserIdOrderByCreatedAtDesc</code>. Tidak perlu menggulir chat.</td>
+        </tr>
+        <tr>
+          <td><b>Siapa boleh apa</b></td>
+          <td>Identitas datang dari JWT, bukan dari klaim client. Gateway memverifikasi token lalu meneruskan <code>X-User-Id</code> dan <code>X-User-Role</code>; service percaya pada gateway. Peran hanya dua: USER dan ADMIN.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pull">
+    Harga pada pesanan adalah salinan, bukan tautan.
+    <span>Kalimat ini menjelaskan satu tabel, satu kolom, dan satu keluhan pembeli sekaligus — dan itu sebabnya <code>order_items</code> terlihat "berlebihan" kalau dilihat tanpa ceritanya.</span>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">Batas cerita</span>
+  <h2>Yang sengaja tidak diklaim</h2>
+  <p class="lede">Cerita yang baik juga menyebut apa yang belum ada. Empat hal ini bukan fitur yang tertinggal — melainkan batas yang sudah ditetapkan, dan sebaiknya disebut lebih dulu sebelum orang lain menemukannya.</p>
+
+  <ul class="plain">
+    <li><b>Pembayaran belum masuk sistem.</b> Enum <code>OrderStatus</code> punya <code>PAID</code>, tapi tidak ada endpoint yang memindahkan pesanan ke sana — satu-satunya transisi yang terpasang adalah pembatalan. Dalam cerita, pembayaran masih diselesaikan di luar aplikasi; di dalam kode, statusnya berhenti di <code>PENDING</code>.</li>
+    <li><b>Pengiriman belum dihitung.</b> Alamat sudah disimpan rapi di user-service, tapi pesanan belum memakainya. Tidak ada ongkir, kurir, atau nomor resi.</li>
+    <li><b>Katalog belum punya foto.</b> Tabel <code>products</code> hanya menyimpan teks dan angka. Frontend menjawabnya dengan thumbnail huruf berwarna, bukan berpura-pura punya galeri gambar.</li>
+    <li><b>Keranjang belum tersimpan di server.</b> Tidak ada tabel keranjang; ia hidup di browser sampai tombol checkout ditekan. Ganti perangkat, keranjang kosong lagi.</li>
+  </ul>
+
+  <div class="note honest">
+    <span class="ttl">Satu kejujuran yang justru memperkuat proyek ini</span>
+    <p>Toko dengan dua ratus barang dan dua pegawai <b>tidak butuh tujuh service terpisah</b>. Satu aplikasi Spring Boot biasa sudah lebih dari cukup, dan akan jauh lebih murah dioperasikan.</p>
+    <p>Yang dikejar di sini bukan arsitektur yang paling pas untuk toko sebesar itu, melainkan <b>latihan atas persoalan yang hanya muncul ketika sistem dipecah</b>: penemuan service, satu pintu masuk, identitas yang menyeberang antar service, pemanggilan antar service, dan batas data yang tidak boleh dilanggar foreign key. Cerita tokonya ada supaya keputusan-keputusan itu punya konteks — bukan supaya seolah-olah ada perusahaan besar yang memesannya.</p>
+    <p>Menyebut ini di awal jauh lebih baik daripada membiarkan pembaca menyimpulkannya sendiri sambil bertanya-tanya apakah kamu menyadarinya.</p>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">Siap tempel</span>
+  <h2>Paragraf untuk README</h2>
+  <p class="lede">Versi padat dari semua di atas, untuk dipasang di bagian atas <code>README.md</code>.</p>
+  <div class="readme">
+    <span class="lbl">ShopNest — tentang produknya</span>
+    <p>ShopNest adalah toko online milik satu usaha, bukan marketplace. Ia menjual perlengkapan rumah dan elektronik kecil dari satu gudang, dikelola dua admin, dengan katalog sekitar dua ratus barang. Pembeli menelusuri katalog, memasukkan barang ke keranjang, dan memesan; admin mengurus katalog dan stok.</p>
+    <p>Dua keputusan produk membentuk hampir seluruh desainnya. <b>Stok hanya boleh diubah oleh satu pemilik</b> — product-service — sehingga checkout harus memintanya lewat panggilan antar service, bukan menulis langsung ke database. Dan <b>harga pada pesanan adalah salinan, bukan tautan</b>: setiap item pesanan menyimpan nama dan harga saat transaksi terjadi, sehingga perubahan harga di katalog tidak pernah mengubah struk yang sudah jadi.</p>
+    <p>Pembayaran, pengiriman, dan foto produk berada di luar cakupan saat ini. Arsitektur microservice-nya sendiri melebihi kebutuhan toko sebesar ini — dipilih dengan sadar sebagai latihan atas persoalan yang hanya muncul ketika sebuah sistem dipecah menjadi beberapa service.</p>
+  </div>
+</section>
+
+<footer>
+  <span>Disusun dari skema dan controller di branch dev · commit e7a5140</span>
+  <span>Pendamping: FRONTEND-BRIEF.html</span>
+</footer>
+
+</div>
+</body>
+</html>

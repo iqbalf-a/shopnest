@@ -1,0 +1,1147 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="PRD dan design system untuk frontend ShopNest.">
+<style>:root{color-scheme:light dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Frontend ShopNest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    /* --- product palette: these ARE the token produk ShopNest --- */
+    --brand-700:#3A48D6;
+    --brand-600:#4A5CF2;
+    --brand-300:#B9C0FB;
+    --brand-100:#E4E7FE;
+    --brand-50:#F3F4FE;
+    --ink:#1D1F27;
+    --ink-2:#43464F;
+    --muted:#767A86;
+    --line:#E6E7EE;
+    --line-soft:#F0F1F5;
+    --ground:#FBFBFD;
+    --surface:#FFFFFF;
+    --surface-2:#F3F4F8;
+    --ok:#0F7E5A;
+    --ok-soft:#E2F4EC;
+    --warn:#8F6100;
+    --warn-soft:#FAEFDA;
+    --bad:#C2372E;
+    --bad-soft:#FBE7E5;
+    --on-brand:#FFFFFF;
+    --shadow-1:0 1px 2px rgba(29,31,39,.05);
+    --shadow-2:0 8px 28px -10px rgba(29,31,39,.16);
+    --r-sm:5px; --r-md:9px; --r-lg:16px;
+    --f-display:"Geist",system-ui,-apple-system,"Segoe UI",sans-serif;
+    --f-ui:"Geist",system-ui,-apple-system,"Segoe UI",sans-serif;
+    --f-mono:"Geist Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --brand-700:#A9B3FF;
+      --brand-600:#8E9AFB;
+      --brand-300:#3B4483;
+      --brand-100:#242A52;
+      --brand-50:#1C2040;
+      --ink:#ECEDF2;
+      --ink-2:#C7CAD4;
+      --muted:#9AA0AE;
+      --line:#2F323C;
+      --line-soft:#262932;
+      --ground:#15161B;
+      --surface:#1C1E25;
+      --surface-2:#24272F;
+      --ok:#55CC9C;
+      --ok-soft:#153429;
+      --warn:#E0AC53;
+      --warn-soft:#372911;
+      --bad:#EC8B82;
+      --bad-soft:#3B231F;
+      --on-brand:#15161B;
+      --shadow-1:0 1px 2px rgba(0,0,0,.45);
+      --shadow-2:0 8px 28px -10px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --brand-700:#A9B3FF; --brand-600:#8E9AFB; --brand-300:#3B4483;
+    --brand-100:#242A52; --brand-50:#1C2040;
+    --ink:#ECEDF2; --ink-2:#C7CAD4; --muted:#9AA0AE;
+    --line:#2F323C; --line-soft:#262932;
+    --ground:#15161B; --surface:#1C1E25; --surface-2:#24272F;
+    --ok:#55CC9C; --ok-soft:#153429;
+    --warn:#E0AC53; --warn-soft:#372911;
+    --bad:#EC8B82; --bad-soft:#3B231F;
+    --on-brand:#15161B;
+    --shadow-1:0 1px 2px rgba(0,0,0,.45);
+    --shadow-2:0 8px 28px -10px rgba(0,0,0,.6);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--ground);color:var(--ink);
+    font-family:var(--f-ui);font-size:15px;line-height:1.7;
+    letter-spacing:-.005em;
+    padding-block:0 80px;padding-left:22px;padding-right:22px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1140px;margin:0 auto}
+  a{color:var(--brand-700)}
+  :focus-visible{outline:2px solid var(--brand-600);outline-offset:2px;border-radius:3px}
+
+  /* masthead */
+  header.mast{padding-block:76px 34px}
+  .kicker{
+    font-family:var(--f-mono);font-size:11px;font-weight:400;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 22px;
+  }
+  h1{
+    font-family:var(--f-display);font-weight:600;
+    font-size:clamp(42px,7.4vw,76px);line-height:1.0;letter-spacing:-.042em;
+    margin:0;text-wrap:balance;
+  }
+  h1 em{font-style:normal;color:var(--brand-700)}
+  .stand{font-size:18px;color:var(--muted);margin:24px 0 0;max-width:62ch;line-height:1.62}
+  .stand b{color:var(--ink);font-weight:600}
+
+  nav.toc{
+    display:flex;flex-wrap:wrap;gap:7px;
+    margin-top:38px;padding-top:26px;border-top:1px solid var(--line);
+  }
+  nav.toc a{
+    font-family:var(--f-mono);font-size:11px;letter-spacing:.01em;
+    text-decoration:none;color:var(--muted);
+    padding:5px 12px;border:1px solid var(--line);border-radius:999px;background:var(--surface);
+  }
+  nav.toc a:hover{border-color:var(--brand-300);color:var(--brand-700);background:var(--brand-50)}
+
+  /* parts */
+  .part{margin-top:88px;padding-top:26px;border-top:1px solid var(--ink)}
+  .part-tag{
+    font-family:var(--f-mono);font-size:10.5px;font-weight:400;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--brand-700);display:block;margin-bottom:10px;
+  }
+  .part h2{
+    font-family:var(--f-display);font-weight:600;
+    font-size:clamp(31px,4.6vw,46px);letter-spacing:-.035em;line-height:1.04;margin:0;
+  }
+  .part > p{margin:14px 0 0;color:var(--muted);font-size:15.5px;max-width:60ch}
+
+  section{padding-block:52px 0}
+  h3{
+    font-family:var(--f-display);font-weight:600;font-size:clamp(23px,3.1vw,29px);
+    letter-spacing:-.028em;line-height:1.18;
+    margin:0 0 8px;display:flex;align-items:baseline;gap:14px;text-wrap:balance;
+  }
+  h3 .n{font-family:var(--f-mono);font-size:11.5px;font-weight:400;color:var(--brand-700);flex:none;letter-spacing:.04em}
+  h4{
+    font-family:var(--f-ui);font-weight:600;font-size:13px;letter-spacing:.02em;
+    text-transform:uppercase;margin:34px 0 12px;color:var(--muted);
+  }
+  .lede{color:var(--muted);margin:0 0 22px;max-width:74ch;font-size:16px;line-height:1.68}
+  p{margin:0 0 16px;max-width:76ch}
+  section > p:last-child{margin-bottom:0}
+  code{font-family:var(--f-mono);font-size:.85em;background:var(--surface-2);padding:2px 5px;border-radius:4px;word-break:break-word}
+  strong{font-weight:600}
+
+  /* panels */
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px 26px}
+  .grid{display:grid;gap:16px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(310px,1fr))}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+
+  /* tables */
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface)}
+  table{border-collapse:collapse;width:100%;min-width:580px;font-size:13.5px}
+  th,td{text-align:left;padding:13px 18px;border-bottom:1px solid var(--line-soft);vertical-align:top;line-height:1.55}
+  thead th{
+    font-family:var(--f-mono);font-size:10px;font-weight:500;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--muted);background:transparent;
+    border-bottom:1px solid var(--line);white-space:nowrap;
+  }
+  tbody tr:last-child td{border-bottom:0}
+  td.mono,th.mono{font-family:var(--f-mono);font-size:12px;white-space:nowrap}
+  td small{display:block;color:var(--muted);font-size:12px;margin-top:3px;line-height:1.5}
+  .num{font-variant-numeric:tabular-nums;text-align:right}
+
+  /* code blocks */
+  pre{
+    margin:0 0 18px;overflow-x:auto;background:var(--surface);
+    border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;
+    font-family:var(--f-mono);font-size:12.2px;line-height:1.7;color:var(--ink-2);
+  }
+  pre b{color:var(--brand-700);font-weight:500}
+  pre i{color:var(--muted);font-style:normal}
+  pre em{color:var(--ok);font-style:normal}
+
+  /* callouts */
+  .call{
+    border-radius:var(--r-lg);padding:20px 24px;margin:0 0 18px;
+    background:var(--surface-2);
+  }
+  .call.stop{background:var(--bad-soft)}
+  .call.warn{background:var(--warn-soft)}
+  .call.pick{background:var(--brand-50)}
+  .call div.body{min-width:0}
+  .call p{margin:0 0 9px}
+  .call p:last-child{margin:0}
+  .call .ttl{
+    font-weight:600;font-size:13.5px;letter-spacing:-.018em;display:block;margin-bottom:7px;
+    color:var(--ink-2);
+  }
+  .call.stop .ttl{color:var(--bad)}
+  .call.warn .ttl{color:var(--warn)}
+  .call.pick .ttl{color:var(--brand-700)}
+
+  /* lists */
+  ul.plain,ul.check{list-style:none;margin:0 0 18px;padding:0}
+  ul.plain li,ul.check li{padding:9px 0 9px 28px;position:relative;border-bottom:1px solid var(--line-soft);font-size:14.5px;line-height:1.62}
+  ul.plain li:last-child,ul.check li:last-child{border-bottom:0}
+  ul.check li::before{
+    content:"";position:absolute;left:2px;top:16px;width:11px;height:11px;
+    border:1.5px solid var(--brand-300);border-radius:3px;
+  }
+  ul.plain li::before{
+    content:"";position:absolute;left:5px;top:19px;width:5px;height:5px;
+    border-radius:50%;background:var(--brand-300);
+  }
+  ul.plain li b,ul.check li b{font-weight:600}
+
+  /* ---------- design system demo pieces ---------- */
+  .swatches{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:12px;margin-bottom:10px}
+  .sw{border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;background:var(--surface)}
+  .sw .chip{height:56px}
+  .sw .meta{padding:9px 11px;font-family:var(--f-mono);font-size:10.5px;line-height:1.55}
+  .sw .meta b{display:block;font-weight:500;color:var(--ink)}
+  .sw .meta span{color:var(--muted)}
+
+  .type-row{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 22px;padding:16px 0;border-bottom:1px solid var(--line-soft)}
+  .type-row:last-child{border-bottom:0}
+  .type-spec{font-family:var(--f-mono);font-size:10.5px;color:var(--muted);flex:0 0 200px;letter-spacing:.02em}
+  .t-d1{font-family:var(--f-display);font-weight:600;font-size:42px;line-height:1.02;letter-spacing:-.042em}
+  .t-d2{font-family:var(--f-display);font-weight:600;font-size:29px;line-height:1.14;letter-spacing:-.032em}
+  .t-d3{font-family:var(--f-ui);font-weight:600;font-size:19px;line-height:1.34;letter-spacing:-.022em}
+  .t-b1{font-size:15px}
+  .t-b2{font-size:13.5px;color:var(--muted)}
+  .t-lb{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .t-pr{font-size:21px;font-weight:700;font-variant-numeric:tabular-nums lining-nums;letter-spacing:-.02em}
+
+  .demo{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+    padding:26px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:10px;
+  }
+  /* demo field: ratakan dari atas supaya label dan kotak input sebaris,
+     walau satu field punya pesan error dan satu lagi punya hint di bawahnya */
+  .demo.fields{align-items:flex-start}
+  .demo.fields .field{align-self:stretch}
+  .demo.fields .field .err,
+  .demo.fields .field .hint{margin-top:auto}
+
+  .btn{
+    font-family:var(--f-ui);font-size:14px;font-weight:600;letter-spacing:-.005em;
+    padding:10px 19px;border-radius:var(--r-md);border:1px solid transparent;
+    cursor:pointer;line-height:1.25;transition:background .14s ease,border-color .14s ease;
+  }
+  .btn-primary{background:var(--brand-600);color:var(--on-brand)}
+  .btn-primary:hover{background:var(--brand-700)}
+  .btn-secondary{background:var(--surface);color:var(--ink);border-color:var(--line)}
+  .btn-secondary:hover{border-color:var(--brand-300);color:var(--brand-700)}
+  .btn-ghost{background:transparent;color:var(--brand-700)}
+  .btn-ghost:hover{background:var(--brand-50)}
+  .btn-danger{background:var(--surface);color:var(--bad);border-color:var(--bad-soft)}
+  .btn-danger:hover{border-color:var(--bad)}
+  .btn[disabled]{opacity:.4;cursor:not-allowed}
+  .btn-sm{font-size:12.5px;padding:7px 14px}
+
+  .field{display:flex;flex-direction:column;gap:7px;flex:1 1 220px;min-width:0}
+  .field label{font-size:12.5px;font-weight:600;color:var(--ink-2)}
+  .field input{
+    font-family:var(--f-ui);font-size:14px;padding:11px 13px;color:var(--ink);
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);width:100%;
+  }
+  .field input:focus{outline:2px solid var(--brand-600);outline-offset:-1px;border-color:var(--brand-600)}
+  .field .err{font-size:12px;color:var(--bad);font-weight:500}
+  .field.invalid input{border-color:var(--bad);background:var(--bad-soft)}
+  .field .hint{font-size:12px;color:var(--muted)}
+
+  .pill{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:11.5px;font-weight:600;letter-spacing:-.002em;
+    padding:5px 11px;border-radius:999px;white-space:nowrap;
+  }
+  .pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
+  .p-ok{background:var(--ok-soft);color:var(--ok)}
+  .p-warn{background:var(--warn-soft);color:var(--warn)}
+  .p-bad{background:var(--bad-soft);color:var(--bad)}
+  .p-neutral{background:var(--surface-2);color:var(--muted)}
+
+  .pcard{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+    overflow:hidden;display:flex;flex-direction:column;width:238px;
+  }
+  .pcard .thumb{
+    aspect-ratio:4/3;max-width:100%;display:grid;place-items:center;
+    font-family:var(--f-display);font-weight:600;font-size:36px;letter-spacing:-.04em;
+    color:var(--brand-700);background:var(--brand-50);
+  }
+  .pcard .pb{padding:14px 15px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+  .pcard .cat{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+  .pcard .nm{font-size:14px;font-weight:600;line-height:1.4;margin:0;letter-spacing:-.008em}
+  .pcard .pr{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums lining-nums;letter-spacing:-.018em}
+  /* stok di kartu: teks biasa, tanpa pil — warna saja yang membedakan keadaan */
+  .stk{font-size:12.5px;font-weight:500;color:var(--muted);font-variant-numeric:tabular-nums;letter-spacing:-.005em}
+  .stk.low{color:var(--warn);font-weight:600}
+  .stk.out{color:var(--bad);font-weight:600}
+  .pcard .ft{margin-top:auto;padding-top:4px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+
+  .state{
+    text-align:center;padding:36px 24px;background:var(--ground);
+    border:1px solid var(--line);border-radius:var(--r-lg);flex:1 1 230px;min-width:0;
+  }
+  .state .ic{
+    width:40px;height:40px;margin:0 auto 14px;border-radius:50%;
+    background:var(--surface-2);display:grid;place-items:center;
+    font-family:var(--f-display);font-size:19px;font-weight:600;color:var(--muted);
+  }
+  .state h5{font-family:var(--f-ui);font-size:15px;font-weight:600;margin:0 0 6px;letter-spacing:-.022em}
+  .state p{font-size:13px;color:var(--muted);margin:0 0 16px;max-width:32ch;margin-inline:auto;line-height:1.55}
+
+  .skel{background:var(--surface-2);border-radius:var(--r-sm);height:11px}
+  .skel.t{height:15px;width:70%}
+  .skel.s{width:42%}
+
+  .toast{
+    display:flex;align-items:flex-start;gap:11px;background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--r-md);padding:13px 14px;box-shadow:var(--shadow-2);max-width:368px;
+  }
+  .toast .ic{
+    flex:none;width:20px;height:20px;border-radius:50%;margin-top:1px;
+    display:grid;place-items:center;background:var(--ok);color:var(--surface);
+  }
+  .toast.bad .ic{background:var(--bad)}
+  .toast .ic svg{display:block;width:11px;height:11px}
+  .toast .tx{min-width:0;flex:1}
+  .toast b{display:block;font-size:13.5px;font-weight:600;margin-bottom:2px;letter-spacing:-.015em}
+  .toast span{font-size:12.5px;color:var(--muted);line-height:1.5;display:block}
+  .toast .x{
+    flex:none;background:none;border:0;cursor:pointer;padding:2px;margin:-2px -2px 0 0;
+    color:var(--muted);line-height:0;border-radius:4px;
+  }
+  .toast .x:hover{color:var(--ink);background:var(--surface-2)}
+  .toast .x svg{display:block;width:12px;height:12px}
+
+  .scale-bar{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;margin-bottom:10px}
+  .scale-bar div{text-align:center;font-family:var(--f-mono);font-size:10px;color:var(--muted)}
+  .scale-bar i{display:block;background:var(--brand-100);border-radius:3px;margin-bottom:6px;height:28px}
+
+  .fontcard{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+    padding:26px 28px;display:flex;flex-direction:column;gap:4px;
+  }
+  .fontcard .sample{font-size:44px;line-height:1.08;letter-spacing:-.042em;margin-bottom:6px;color:var(--ink);font-weight:600}
+  .fontcard .glyphs{
+    font-size:15px;letter-spacing:-.005em;color:var(--muted);line-height:1.55;
+    padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--line-soft);word-break:break-word;
+  }
+  .fontcard .fname{font-family:var(--f-mono);font-size:11.5px;color:var(--brand-700);letter-spacing:.03em}
+  .fontcard .frole{font-size:13.5px;color:var(--muted);line-height:1.62;margin:8px 0 0}
+  .wt-list{display:flex;flex-direction:column;gap:0;margin:14px 0 0}
+  .wt{
+    display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+    padding:9px 0;border-bottom:1px solid var(--line-soft);
+  }
+  .wt:last-child{border-bottom:0}
+  .wt .w{font-family:var(--f-mono);font-size:10.5px;color:var(--muted);flex:0 0 104px;letter-spacing:.02em}
+  .wt .s{font-size:17px;letter-spacing:-.022em;color:var(--ink)}
+
+  footer{
+    margin-top:80px;padding-top:24px;border-top:1px solid var(--line);
+    font-family:var(--f-mono);font-size:11px;color:var(--muted);
+    display:flex;flex-wrap:wrap;gap:8px 24px;
+  }
+
+  @media (max-width:640px){
+    header.mast{padding-block:44px 24px}
+    .type-spec{flex-basis:100%}
+    .t-d1{font-size:34px}
+    .pcard{width:100%}
+    .part{margin-top:60px}
+    section{padding-block:40px 0}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<header class="mast">
+  <p class="kicker">PRD &amp; design system · frontend · 11 September 2026</p>
+  <h1>ShopNest</h1>
+  <p class="stand">PRD dan design system untuk membangun frontend ShopNest di <b>repo terpisah</b>, jalan dengan <b>dummy data</b> lebih dulu, lalu disambungkan ke gateway tanpa menulis ulang satu komponen pun. Semua kontrak di dokumen ini dibaca dari kode backend di branch <code>dev</code>.</p>
+  <nav class="toc">
+    <a href="#repo">Keputusan repo</a>
+    <a href="#framework">Pilihan framework</a>
+    <a href="#scope">Scope v1</a>
+    <a href="#routes">Halaman &amp; rute</a>
+    <a href="#contract">Kontrak API</a>
+    <a href="#dummy">Strategi dummy</a>
+    <a href="#gaps">Celah backend</a>
+    <a href="#done">Definition of done</a>
+    <a href="#color">Warna</a>
+    <a href="#type">Tipografi</a>
+    <a href="#comp">Komponen</a>
+    <a href="#domain">Pola domain</a>
+    <a href="#tokens">File token</a>
+  </nav>
+</header>
+
+<!-- ============================= PART 1 ============================= -->
+<div class="part">
+  <span class="part-tag">Bagian 1</span>
+  <h2>PRD</h2>
+  <p>Apa yang dibangun, untuk siapa, sampai batas mana, dan bagaimana dummy data ditukar dengan API asli nanti.</p>
+</div>
+
+<section id="goal">
+  <h3><span class="n">1.1</span> Tujuan</h3>
+  <p class="lede">ShopNest hari ini adalah API tanpa wajah — dinilai lewat Postman. Frontend ini mengubahnya jadi produk yang bisa dibuka, diklik, dan dipahami dalam dua menit oleh orang yang tidak akan pernah membaca kode Java-nya.</p>
+  <div class="grid g3">
+    <div class="panel">
+      <h4 style="margin-top:0">Tujuan utama</h4>
+      <p style="margin:0;font-size:14.5px;color:var(--muted)">Satu alur belanja yang utuh dan jujur: cari produk → keranjang → checkout → lihat riwayat order. Bukan galeri komponen.</p>
+    </div>
+    <div class="panel">
+      <h4 style="margin-top:0">Tujuan kedua</h4>
+      <p style="margin:0;font-size:14.5px;color:var(--muted)">Menunjukkan bahwa frontend paham batas service: harga adalah snapshot, stok milik product-service, identitas datang dari token.</p>
+    </div>
+    <div class="panel">
+      <h4 style="margin-top:0">Bukan tujuan</h4>
+      <p style="margin:0;font-size:14.5px;color:var(--muted)">Bukan kloning Tokopedia. Tanpa pembayaran sungguhan, tanpa rekomendasi, tanpa chat, tanpa ongkir.</p>
+    </div>
+  </div>
+</section>
+
+<section id="repo">
+  <h3><span class="n">1.2</span> Keputusan: repo baru</h3>
+  <p class="lede">Repo terpisah — sesuai arahanmu, dan memang pilihan yang tepat di sini. Alasannya bukan sekadar "beda project", tapi tiga hal konkret:</p>
+  <ul class="plain">
+    <li><b>Siklus rilis beda.</b> Frontend akan di-deploy puluhan kali sehari saat styling; backend jarang. Satu repo berarti setiap commit CSS ikut memicu build Maven tujuh modul.</li>
+    <li><b>Toolchain tidak bertemu.</b> <code>shopnest</code> adalah repo Maven murni — <code>.gitignore</code>-nya tidak mengenal <code>node_modules</code>, dan tidak ada satu pun file JS di sana. Menyelipkan Node di dalamnya mengaburkan identitas repo backend yang sekarang rapi.</li>
+    <li><b>Dummy data dulu.</b> Fase pertama tidak menyentuh backend sama sekali. Menyandera frontend di repo backend memaksa orang meng-clone tujuh service hanya untuk mengubah warna tombol.</li>
+  </ul>
+  <div class="call pick">
+    <div class="body">
+      <span class="ttl">Syarat agar repo terpisah tetap murah</span>
+      <p>Satu risiko nyata dari dua repo: kontrak API bisa melenceng diam-diam. Tambal dengan dua kebiasaan — simpan tipe TypeScript di satu file <code>src/api/types.ts</code> yang <em>hanya</em> mencerminkan DTO backend (lihat §1.6), dan salin <code>docs/schema.sql</code> serta brief ini ke repo frontend sebagai referensi beku. Kalau backend berubah, tipe ini yang pertama diperbarui.</p>
+    </div>
+  </div>
+  <h4>Nama &amp; struktur yang disarankan</h4>
+  <pre><i># repo baru, sejajar dengan shopnest</i>
+shopnest-frontend/
+├─ src/
+│  ├─ api/          <i>client, types.ts, query hooks — satu-satunya yang tahu soal HTTP</i>
+│  ├─ mocks/        <i>handler MSW + data dummy (fase 1)</i>
+│  ├─ features/     <i>auth/ catalog/ cart/ checkout/ orders/ profile/</i>
+│  ├─ components/   <i>primitif design system: Button, Field, Pill, Price…</i>
+│  ├─ styles/       <i>tokens.css — hasil Bagian 2</i>
+│  └─ routes/
+├─ .env.example     <i>VITE_API_BASE_URL=http://localhost:8080</i>
+└─ README.md        <i>tautkan balik ke repo shopnest</i></pre>
+</section>
+
+<section id="framework">
+  <h3><span class="n">1.3</span> Framework: React + TypeScript + Vite</h3>
+  <p class="lede">Pertanyaan sebenarnya bukan "React atau Vue", tapi <b>"perlu server rendering atau tidak"</b>. Bentuk backend ShopNest sudah menjawabnya.</p>
+
+  <div class="call pick">
+    <div class="body">
+      <span class="ttl">Rekomendasi: SPA dengan Vite — bukan Next.js</span>
+      <p>ShopNest mengautentikasi lewat <b>header <code>Authorization: Bearer</code>, bukan cookie</b>. Next.js baru berguna kalau server bisa ikut membaca sesi — dan server Next tidak bisa membaca token yang disimpan di browser tanpa kamu memindahkannya ke cookie, yang berarti mengubah backend. Hasilnya: hampir semua halaman tetap jadi client component, tapi kamu menambah satu runtime Node di depan gateway yang sudah jadi satu-satunya pintu. Lapisan tanpa imbalan.</p>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Kandidat</th><th>Yang didapat di project ini</th><th>Yang dibayar</th><th class="mono">Putusan</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="mono"><b>React + Vite</b><small>+ TypeScript</small></td>
+          <td>Build jadi file statis — bisa disajikan nginx atau di-drop ke Vercel/Netlify tanpa runtime. Ekosistem terbesar untuk pola yang dibutuhkan di sini (tabel, form, query cache).</td>
+          <td>SEO nihil. Tidak masalah: katalog di balik demo lokal tidak untuk diindeks Google.</td>
+          <td class="mono" style="color:var(--ok);font-weight:600">PAKAI</td>
+        </tr>
+        <tr>
+          <td class="mono">Next.js</td>
+          <td>SSR, SEO, route handler. Berguna kalau suatu hari halaman produk harus muncul di hasil pencarian.</td>
+          <td>Runtime Node tambahan di docker-compose; auth header harus dipindah ke cookie agar SSR ada gunanya — artinya menyentuh gateway.</td>
+          <td class="mono" style="color:var(--muted)">NANTI</td>
+        </tr>
+        <tr>
+          <td class="mono">Vue / Nuxt</td>
+          <td>Sama mampunya. Nuxt punya kompromi yang sama dengan Next.</td>
+          <td>Tidak ada keunggulan khusus di sini; pilih hanya kalau kamu memang lebih cepat menulis Vue.</td>
+          <td class="mono" style="color:var(--muted)">SETARA</td>
+        </tr>
+        <tr>
+          <td class="mono">Thymeleaf / server-side Java</td>
+          <td>Satu bahasa, satu repo.</td>
+          <td>Membunuh alasan utama arsitektur ini ada: gateway sebagai batas untuk client mana pun. Juga menghapus nilai portofolio "saya bisa frontend".</td>
+          <td class="mono" style="color:var(--bad)">HINDARI</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>Paket pendamping dan alasannya</h4>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th class="mono">Paket</th><th>Untuk apa</th><th>Kenapa ini yang dipilih</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">TanStack Query</td><td>Ambil data, cache, refetch, status loading/error</td><td>Backend ini punya banyak <code>GET</code> yang saling bergantung (katalog → detail → order). Query menghapus 80% <code>useEffect</code> dan memberi status loading/error yang konsisten — yang langsung dipakai komponen di §2.5.</td></tr>
+        <tr><td class="mono">React Router</td><td>Rute dan guard halaman</td><td>Cukup untuk SPA; rute terlindungi tinggal satu wrapper yang membaca token.</td></tr>
+        <tr><td class="mono">MSW</td><td>Dummy data fase 1</td><td><b>Kunci dari "dummy dulu"</b> — lihat §1.7. Mencegat di lapisan jaringan, bukan di dalam komponen.</td></tr>
+        <tr><td class="mono">Zod</td><td>Validasi form + parsing response</td><td>Aturan validasi backend sudah pasti (§1.6); Zod menirunya persis agar error muncul sebelum request dikirim.</td></tr>
+        <tr><td class="mono">Tailwind CSS</td><td>Styling</td><td>Token di Bagian 2 dipetakan langsung jadi theme Tailwind. Kalau lebih suka CSS Modules, token yang sama tetap berlaku — Bagian 2 ditulis sebagai CSS variable, bukan util class.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="margin-top:18px;color:var(--muted);font-size:14.5px">Sengaja <b>tidak</b> ada state manager global (Redux/Zustand) di daftar ini. Data server ditangani Query; satu-satunya state klien yang nyata adalah keranjang dan token — cukup dengan Context + <code>localStorage</code>. Tambahkan Zustand hanya kalau keranjang tumbuh rumit.</p>
+</section>
+
+<section id="scope">
+  <h3><span class="n">1.4</span> Scope v1</h3>
+  <p class="lede">Batas dipilih dari apa yang benar-benar didukung backend hari ini. Semua yang di kolom kanan bukan "malas" — melainkan belum ada endpoint-nya.</p>
+  <div class="grid g2">
+    <div class="panel">
+      <h4 style="margin-top:0;color:var(--ok)">Masuk v1</h4>
+      <ul class="plain" style="margin-bottom:0">
+        <li>Daftar &amp; masuk, simpan sesi, keluar</li>
+        <li>Katalog: daftar, pagination, filter kategori, pencarian nama</li>
+        <li>Detail produk + indikator stok</li>
+        <li>Keranjang sisi klien (tambah, ubah jumlah, hapus)</li>
+        <li>Checkout → <code>POST /api/orders</code></li>
+        <li>Riwayat order + detail item</li>
+        <li>Batalkan order berstatus PENDING</li>
+        <li>Profil: buat, ubah, kelola alamat</li>
+        <li>Panel admin sederhana: CRUD produk</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h4 style="margin-top:0;color:var(--muted)">Ditunda</h4>
+      <ul class="plain" style="margin-bottom:0">
+        <li><b>Pembayaran</b> — tidak ada endpoint ke status <code>PAID</code></li>
+        <li><b>Ongkir &amp; kurir</b> — alamat tersimpan tapi tidak dipakai order</li>
+        <li><b>Upload gambar produk</b> — tabel <code>products</code> tidak punya kolom gambar</li>
+        <li><b>Wishlist, ulasan, rating</b> — tidak ada tabelnya</li>
+        <li><b>Refresh token</b> — backend hanya menerbitkan satu access token</li>
+        <li><b>Keranjang lintas perangkat</b> — tidak ada tabel cart</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="routes">
+  <h3><span class="n">1.5</span> Halaman &amp; rute</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th class="mono">Rute</th><th>Halaman</th><th>Akses</th><th>Endpoint yang dipakai</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">/</td><td>Katalog<small>Grid produk, filter kategori, pencarian, pagination</small></td><td><span class="pill p-neutral">Publik</span></td><td class="mono">GET /api/products</td></tr>
+        <tr><td class="mono">/p/:id</td><td>Detail produk<small>Harga, stok, tambah ke keranjang</small></td><td><span class="pill p-neutral">Publik</span></td><td class="mono">GET /api/products/{id}</td></tr>
+        <tr><td class="mono">/login</td><td>Masuk</td><td><span class="pill p-neutral">Publik</span></td><td class="mono">POST /api/auth/login</td></tr>
+        <tr><td class="mono">/register</td><td>Daftar</td><td><span class="pill p-neutral">Publik</span></td><td class="mono">POST /api/auth/register</td></tr>
+        <tr><td class="mono">/cart</td><td>Keranjang<small>Murni lokal — tidak ada request sampai checkout</small></td><td><span class="pill p-neutral">Publik</span></td><td class="mono">—</td></tr>
+        <tr><td class="mono">/checkout</td><td>Konfirmasi pesanan<small>Ringkasan item, alamat terpilih, tombol pesan</small></td><td><span class="pill p-ok">Login</span></td><td class="mono">POST /api/orders</td></tr>
+        <tr><td class="mono">/orders</td><td>Riwayat order</td><td><span class="pill p-ok">Login</span></td><td class="mono">GET /api/orders</td></tr>
+        <tr><td class="mono">/orders/:id</td><td>Detail order<small>Item snapshot, total, tombol batal</small></td><td><span class="pill p-ok">Login</span></td><td class="mono">GET /api/orders/{id}<br>PATCH /api/orders/{id}/cancel</td></tr>
+        <tr><td class="mono">/profile</td><td>Profil &amp; alamat</td><td><span class="pill p-ok">Login</span></td><td class="mono">GET/POST/PUT /api/users/…<br>…/addresses</td></tr>
+        <tr><td class="mono">/admin/products</td><td>Kelola produk<small>Tabel + form buat/ubah/hapus</small></td><td><span class="pill p-warn">Role ADMIN</span></td><td class="mono">POST/PUT/DELETE /api/products</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="call warn" style="margin-top:18px">
+    <div class="body">
+      <span class="ttl">Rute admin hanya disembunyikan, belum diamankan</span>
+      <p>Tidak ada <code>@PreAuthorize</code> di <code>ProductController</code>. Menyembunyikan menu berdasarkan <code>role</code> dari token adalah keputusan UX, <b>bukan keamanan</b> — siapa pun yang punya token valid masih bisa memanggil <code>POST /api/products</code> langsung. Jangan tulis di README bahwa panel admin "terlindungi" sampai backend menambahkan guard-nya.</p>
+    </div>
+  </div>
+</section>
+
+<section id="contract">
+  <h3><span class="n">1.6</span> Kontrak API yang harus ditiru</h3>
+  <p class="lede">Ini bagian terpenting untuk strategi dummy: <b>data palsu harus berbentuk persis seperti data asli</b>, sampai ke nama field dan bungkus response-nya. Semua di bawah disalin dari DTO backend, bukan dikarang.</p>
+
+  <h4>Amplop response — seragam di keempat service</h4>
+  <pre><i>// setiap response, sukses maupun gagal, dibungkus ini</i>
+<b>type</b> ApiResponse&lt;T&gt; = {
+  success: <em>boolean</em>
+  message: <em>string</em>      <i>// "Products found", "Invalid email or password", …</i>
+  data: T | <em>null</em>        <i>// null saat error</i>
+}
+
+<i>// khusus daftar produk, data-nya dibungkus lagi</i>
+<b>type</b> PageResponse&lt;T&gt; = {
+  content: T[]; page: <em>number</em>; size: <em>number</em>
+  totalElements: <em>number</em>; totalPages: <em>number</em>; last: <em>boolean</em>
+}</pre>
+
+  <h4>Tipe domain</h4>
+  <pre><b>type</b> AuthResponse = {
+  accessToken: <em>string</em>; tokenType: <em>"Bearer"</em>
+  email: <em>string</em>; name: <em>string</em>; role: <em>"USER" | "ADMIN"</em>
+}
+
+<b>type</b> Product = {
+  id: <em>string</em>          <i>// UUID</i>
+  name: <em>string</em>; description: <em>string | null</em>
+  price: <em>number</em>       <i>// BigDecimal(15,2) → JSON number, mis. 149000.00</i>
+  stock: <em>number</em>; category: <em>string</em>
+}
+
+<b>type</b> Order = {
+  id: <em>string</em>; userId: <em>string</em>
+  status: <em>"PENDING" | "PAID" | "CANCELLED"</em>
+  totalAmount: <em>number</em>
+  items: OrderItem[]
+  createdAt: <em>string</em>     <i>// LocalDateTime → "2026-09-11T10:14:03.221"  (tanpa zona!)</i>
+}
+
+<b>type</b> OrderItem = {
+  productId: <em>string</em>; productName: <em>string</em>
+  price: <em>number</em>        <i>// snapshot saat order dibuat — bukan harga katalog hari ini</i>
+  quantity: <em>number</em>; subtotal: <em>number</em>
+}
+
+<b>type</b> Profile = {
+  id: <em>string</em>; userId: <em>string</em>
+  fullName: <em>string</em>; phoneNumber: <em>string | null</em>
+  birthDate: <em>string | null</em>   <i>// "1998-04-21"</i>
+  addresses: Address[]
+}
+
+<b>type</b> Address = {
+  id: <em>string</em>; label: <em>string</em>; street: <em>string</em>
+  city: <em>string</em>; postalCode: <em>string</em>; isDefault: <em>boolean</em>
+}</pre>
+
+  <h4>Status error dan artinya di UI</h4>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th class="mono">Status</th><th>Kapan muncul</th><th>Bentuk <code>data</code></th><th>Perlakuan di UI</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">400</td><td>Validasi gagal (<code>@Valid</code>)</td><td class="mono">Record&lt;field, pesan&gt;</td><td>Tempel tiap pesan di bawah field-nya, bukan di toast</td></tr>
+        <tr><td class="mono">401</td><td>Email/password salah, atau token kadaluwarsa/hilang</td><td class="mono">null</td><td>Di form login: pesan inline. Di tempat lain: hapus sesi, lempar ke <code>/login</code></td></tr>
+        <tr><td class="mono">404</td><td>Produk / order / profil tidak ditemukan</td><td class="mono">null</td><td>Halaman kosong dengan jalan keluar, bukan toast</td></tr>
+        <tr><td class="mono">409</td><td>Email sudah terdaftar; profil sudah ada</td><td class="mono">null</td><td>Inline di field email</td></tr>
+        <tr><td class="mono">400</td><td>Stok kurang; order tidak bisa dibatalkan</td><td class="mono">null</td><td>Toast merah + refresh data produk/order</td></tr>
+        <tr><td class="mono">500</td><td>Apa pun yang lain</td><td class="mono">null</td><td>Pesan umum + tombol coba lagi; jangan tampilkan <code>message</code> mentah</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>Aturan validasi — tiru persis di Zod</h4>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th class="mono">Form</th><th>Aturan backend</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">register</td><td><code>name</code> wajib · <code>email</code> wajib + format email · <code>password</code> wajib, minimal 8 karakter</td></tr>
+        <tr><td class="mono">login</td><td><code>email</code> wajib + format email · <code>password</code> wajib</td></tr>
+        <tr><td class="mono">produk</td><td><code>name</code> wajib · <code>price</code> wajib, &gt; 0 · <code>stock</code> wajib, ≥ 0 · <code>category</code> wajib · <code>description</code> opsional</td></tr>
+        <tr><td class="mono">order</td><td>tiap item: <code>productId</code> wajib · <code>quantity</code> wajib, minimal 1</td></tr>
+        <tr><td class="mono">profil</td><td><code>fullName</code> wajib · <code>phoneNumber</code>, <code>birthDate</code> opsional</td></tr>
+        <tr><td class="mono">alamat</td><td><code>label</code>, <code>street</code>, <code>city</code>, <code>postalCode</code> wajib · <code>isDefault</code> default <code>false</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="dummy">
+  <h3><span class="n">1.7</span> Strategi dummy data</h3>
+  <p class="lede">Prinsipnya satu: <b>komponen tidak boleh tahu bahwa datanya palsu</b>. Kalau ada satu saja <code>if (isMock)</code> di dalam komponen, penukaran nanti jadi pekerjaan ulang.</p>
+
+  <div class="grid g2">
+    <div class="panel">
+      <h4 style="margin-top:0;color:var(--ok)">Lakukan — cegat di lapisan jaringan</h4>
+      <p style="font-size:14.5px;color:var(--muted);margin:0 0 12px">MSW mendaftarkan service worker yang menjawab <code>fetch</code> ke <code>/api/*</code>. Kode aplikasi tetap memanggil <code>fetch("/api/products")</code> seperti biasa.</p>
+      <pre style="margin:0;font-size:11.5px"><i>// src/mocks/handlers.ts</i>
+http.get("*/api/products", ({ request }) =&gt; {
+  <b>const</b> url = <b>new</b> URL(request.url)
+  <b>const</b> page = Number(url.searchParams.get("page") ?? 0)
+  <i>// filter + potong halaman dari array dummy</i>
+  <b>return</b> HttpResponse.json({
+    success: <em>true</em>, message: <em>"Products found"</em>,
+    data: { content, page, size, totalElements, totalPages, last }
+  })
+})</pre>
+    </div>
+    <div class="panel">
+      <h4 style="margin-top:0;color:var(--bad)">Hindari — dummy di dalam komponen</h4>
+      <p style="font-size:14.5px;color:var(--muted);margin:0 0 12px">Pola ini terasa cepat di hari pertama dan mahal di minggu ketiga: status loading tidak pernah teruji, error tidak pernah muncul, dan setiap komponen harus disentuh saat pindah ke API asli.</p>
+      <pre style="margin:0;font-size:11.5px"><i>// jangan</i>
+<b>const</b> products = DUMMY_PRODUCTS
+<b>if</b> (loading) …  <i>// tidak akan pernah true</i>
+<b>if</b> (error) …    <i>// tidak akan pernah terjadi</i></pre>
+    </div>
+  </div>
+
+  <h4>Isi data dummy yang layak</h4>
+  <ul class="plain">
+    <li><b>24–30 produk</b> di 5–6 kategori, cukup untuk menguji pagination default backend (<code>size=10</code>) sampai halaman ketiga.</li>
+    <li><b>Harga rupiah yang realistis</b>: 15.000 sampai 4.500.000 — menguji apakah layout tahan angka panjang. Sertakan satu produk 1.250.000,50 untuk membuktikan desimal tidak dibulatkan sembarangan.</li>
+    <li><b>Tiga kondisi stok</b>: habis (0), menipis (1–5), aman. Ketiganya punya tampilan berbeda di §2.6.</li>
+    <li><b>Order di ketiga status</b>, termasuk satu <code>PAID</code> — walaupun UI belum bisa membuatnya, riwayat harus siap menampilkannya.</li>
+    <li><b>Satu order dengan 8 item</b> dan satu dengan 1 item, untuk menguji ringkasan yang panjang dan yang pendek.</li>
+    <li><b>Deskripsi produk kosong</b> di beberapa entri — <code>description</code> boleh <code>null</code> di database.</li>
+  </ul>
+
+  <h4>Rencana penukaran ke API asli</h4>
+  <ul class="check">
+    <li>Ganti <code>VITE_API_BASE_URL</code> dari kosong (MSW) ke <code>http://localhost:8080</code>.</li>
+    <li>Hentikan pendaftaran worker MSW di <code>main.tsx</code> — satu blok <code>if (import.meta.env.DEV &amp;&amp; USE_MOCKS)</code>.</li>
+    <li>Tambahkan CORS di gateway lebih dulu (§1.8) — tanpa ini, semua request gagal di browser.</li>
+    <li>Jalankan ulang seluruh alur dan bandingkan: bentuk response harus identik dengan dummy. Selisih apa pun berarti §1.6 yang salah, bukan komponennya.</li>
+  </ul>
+  <p style="color:var(--muted);font-size:14.5px">Handler MSW tidak dibuang setelah itu — pindahkan ke test. Mereka jadi fondasi pengujian komponen tanpa menyalakan tujuh service.</p>
+</section>
+
+<section id="gaps">
+  <h3><span class="n">1.8</span> Celah backend yang mempengaruhi frontend</h3>
+  <p class="lede">Enam hal yang ditemukan saat membaca kode. Tidak satu pun menghalangi fase dummy, tapi semuanya akan muncul di hari penyambungan. Diurutkan dari yang paling pasti menggigit.</p>
+
+  <div class="call stop">
+    <div class="body">
+      <span class="ttl">1 · Tidak ada konfigurasi CORS di mana pun — pemblokir mutlak</span>
+      <p>Pencarian <code>cors</code> di seluruh Java dan properties tidak menghasilkan apa pun. Postman tidak peduli CORS, jadi ini tidak pernah ketahuan. Browser peduli: <b>setiap</b> request dari <code>localhost:5173</code> ke <code>localhost:8080</code> akan ditolak sebelum sampai ke gateway. Perbaikannya kecil — satu <code>CorsWebFilter</code> di api-gateway yang mengizinkan origin dev — tapi harus ada sebelum baris frontend pertama menyentuh API asli.</p>
+    </div>
+  </div>
+
+  <div class="call warn">
+    <div class="body">
+      <span class="ttl">2 · Order dan profil orang lain bisa dibaca</span>
+      <p><code>GET /api/orders/{id}</code> hanya menerima id dari path — tidak dicocokkan dengan <code>X-User-Id</code>. Hal yang sama pada <code>GET</code>/<code>PUT /api/users/{userId}</code>. Frontend tidak bisa menambal ini; jangan bangun fitur apa pun yang bergantung pada asumsi order bersifat privat.</p>
+    </div>
+  </div>
+
+  <div class="call warn">
+    <div class="body">
+      <span class="ttl">3 · Status PAID tidak punya jalan masuk</span>
+      <p>Enum-nya ada, tapi satu-satunya transisi yang terpasang adalah <code>/cancel</code>. Artinya v1 tidak boleh menampilkan tombol "Bayar" yang tidak melakukan apa-apa. Tampilkan <code>PENDING</code> apa adanya, dan siapkan tampilan <code>PAID</code> untuk data yang masuk dari luar.</p>
+    </div>
+  </div>
+
+  <ul class="plain">
+    <li><b>4 · Tidak ada refresh token.</b> Satu access token dengan masa berlaku dari <code>jwt.expiration</code>. Saat kadaluwarsa, satu-satunya jalan adalah login ulang — rancang penanganan 401 sebagai "sesi habis, masuk lagi", bukan percobaan diam-diam.</li>
+    <li><b>5 · Produk tidak punya kolom gambar.</b> Tabel <code>products</code> hanya menyimpan teks dan angka. Design system menjawab ini dengan thumbnail huruf berwarna (§2.5) — pilihan desain yang sadar, bukan placeholder abu-abu.</li>
+    <li><b>6 · Keranjang tidak ada di backend.</b> Sepenuhnya milik klien sampai tombol checkout ditekan. Konsekuensinya harus jujur di UI: keranjang hilang kalau ganti perangkat, dan harga di keranjang bisa basi — muat ulang harga saat halaman checkout dibuka.</li>
+  </ul>
+</section>
+
+<section id="done">
+  <h3><span class="n">1.9</span> Definition of done &amp; urutan kerja</h3>
+  <div class="grid g2">
+    <div class="panel">
+      <h4 style="margin-top:0">Selesai berarti</h4>
+      <ul class="check" style="margin-bottom:0">
+        <li>Setiap halaman punya empat wajah: loading, kosong, error, terisi</li>
+        <li>Semua harga lewat satu fungsi format — tidak ada <code>toLocaleString</code> yang berserakan</li>
+        <li>Form menolak input yang pasti ditolak backend, sebelum request dikirim</li>
+        <li>401 di mana pun mengakhiri sesi dengan bersih</li>
+        <li>Terbaca di 375px — checkout termasuk</li>
+        <li>Navigasi keyboard sampai tombol checkout tanpa jebakan fokus</li>
+        <li>Kedua tema terang dan gelap terbaca</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h4 style="margin-top:0">Urutan yang disarankan</h4>
+      <ul class="plain" style="margin-bottom:0">
+        <li><b>M1 · Fondasi</b> — Vite, token dari Bagian 2, primitif Button/Field/Pill, layout</li>
+        <li><b>M2 · Katalog dummy</b> — MSW, grid, filter, pagination, detail</li>
+        <li><b>M3 · Sesi</b> — login/daftar, simpan token, rute terlindungi</li>
+        <li><b>M4 · Belanja</b> — keranjang, checkout, riwayat, pembatalan</li>
+        <li><b>M5 · Profil &amp; admin</b> — alamat, CRUD produk</li>
+        <li><b>M6 · Sambungkan</b> — CORS di gateway, matikan MSW, uji ulang penuh</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= PART 2 ============================= -->
+<div class="part">
+  <span class="part-tag">Bagian 2</span>
+  <h2>Design system</h2>
+  <p>Token, komponen, dan pola domain. Halaman ini memakai token yang sama dengan yang didefinisikannya — apa yang kamu lihat di bawah adalah hasil nyatanya.</p>
+</div>
+
+<section id="principles">
+  <h3><span class="n">2.1</span> Tiga prinsip</h3>
+  <div class="grid g3">
+    <div class="panel">
+      <h4 style="margin-top:0">Angka adalah bintangnya</h4>
+      <p style="margin:0;font-size:14.5px;color:var(--muted)">Ini toko. Harga, stok, dan total adalah informasi yang dicari orang. Semua angka pakai <code>tabular-nums</code> agar berbaris rapi, dan harga selalu punya bobot tipografi lebih besar dari nama produk di sekitarnya.</p>
+    </div>
+    <div class="panel">
+      <h4 style="margin-top:0">Warna dipakai untuk status, bukan dekorasi</h4>
+      <p style="margin:0;font-size:14.5px;color:var(--muted)">Hijau, kuning, dan merah hanya berarti stok dan status order. Indigo hanya berarti "ini bisa diklik". Kalau semua berwarna, tidak ada yang menonjol saat stok habis.</p>
+    </div>
+    <div class="panel">
+      <h4 style="margin-top:0">Tanpa foto, tetap punya wajah</h4>
+      <p style="margin:0;font-size:14.5px;color:var(--muted)">Katalog tanpa gambar produk mudah terlihat seperti spreadsheet. Jawabannya bukan kotak abu-abu, melainkan thumbnail huruf berwarna yang konsisten per kategori.</p>
+    </div>
+  </div>
+</section>
+
+<section id="type">
+  <h3><span class="n">2.2</span> Tipografi</h3>
+  <p class="lede">Dua keluarga saja, dan keduanya dari rumpun yang sama: <b>Geist</b> untuk semua teks, <b>Geist Mono</b> untuk kode dan label. Tanpa serif — hierarki dibentuk oleh ukuran, bobot, dan tracking, bukan oleh pergantian wajah huruf. Keduanya tersedia di Google Fonts, jadi tidak ada aset yang perlu di-host sendiri.</p>
+
+  <h4>Font yang dipakai</h4>
+  <div class="grid g2" style="margin-bottom:22px">
+
+    <div class="fontcard">
+      <div class="sample">Belanja tanpa drama</div>
+      <p class="glyphs">ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>0123456789 Rp ,. % — &amp; @ /</p>
+      <span class="fname">Geist · Vercel · OFL</span>
+      <p class="frole"><b>Judul, antarmuka, teks berjalan — semuanya.</b> Grotesque bergaya Swiss dengan spasi rata dan tanpa detail dekoratif. Angkanya tegas dan lebarnya seragam, yang penting untuk kolom harga dan stok.</p>
+      <div class="wt-list">
+        <div class="wt"><span class="w">300 · light</span><span class="s" style="font-weight:300">Rp 1.250.000</span></div>
+        <div class="wt"><span class="w">400 · regular</span><span class="s" style="font-weight:400">Teks berjalan &amp; body</span></div>
+        <div class="wt"><span class="w">500 · medium</span><span class="s" style="font-weight:500">Label &amp; nilai tabel</span></div>
+        <div class="wt"><span class="w">600 · semibold</span><span class="s" style="font-weight:600">Judul &amp; nama produk</span></div>
+        <div class="wt"><span class="w">700 · bold</span><span class="s" style="font-weight:700">Harga &amp; total</span></div>
+        <div class="wt"><span class="w">800 · extrabold</span><span class="s" style="font-weight:800">Angka besar saja</span></div>
+      </div>
+    </div>
+
+    <div class="fontcard">
+      <div class="sample" style="font-family:var(--f-mono);font-size:36px;letter-spacing:-.02em">8f3a·c210</div>
+      <p class="glyphs" style="font-family:var(--f-mono);font-size:13.5px">ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>0123456789 {} [] () &lt;&gt; /\ |</p>
+      <span class="fname">Geist Mono · Vercel · OFL</span>
+      <p class="frole"><b>Kode, UUID, endpoint, label kategori.</b> Pasangan resmi Geist, jadi tinggi huruf dan warnanya cocok saat mono berdampingan dengan teks biasa di satu baris.</p>
+      <div class="wt-list">
+        <div class="wt"><span class="w">400 · regular</span><span class="s" style="font-family:var(--f-mono);font-size:14.5px">GET /api/products</span></div>
+        <div class="wt"><span class="w">500 · medium</span><span class="s" style="font-family:var(--f-mono);font-size:14.5px;font-weight:500">POST /api/orders</span></div>
+        <div class="wt"><span class="w">uppercase · .1em</span><span class="s t-lb" style="font-size:11px">ELEKTRONIK</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="call pick">
+    <div class="body">
+      <span class="ttl">Kenapa Geist, bukan Inter</span>
+      <p>Keduanya sama-sama grotesque netral, tapi Inter sudah terlalu sering dipakai sehingga halaman yang memakainya cenderung terbaca sebagai template. Geist dibuat Vercel sebagai typeface antarmuka dengan spasi yang lebih rata dan bentuk yang sedikit lebih tegas — netral tanpa terdengar seperti font bawaan sistem. Bonusnya nyata: <b>Geist Mono adalah pasangan resminya</b>, sehingga kode dan teks biasa punya tinggi dan bobot visual yang cocok. Memakai satu rumpun untuk dua peran menghapus seluruh urusan menyerasikan dua foundry yang berbeda.</p>
+    </div>
+  </div>
+
+  <h4>Skala tipografi</h4>
+  <div class="panel">
+    <div class="type-row"><span class="type-spec">display/1 · Geist 600 · 42/1.02 · −.042em</span><span class="t-d1">Belanja tanpa drama</span></div>
+    <div class="type-row"><span class="type-spec">display/2 · Geist 600 · 29/1.14 · −.032em</span><span class="t-d2">Riwayat pesanan</span></div>
+    <div class="type-row"><span class="type-spec">heading · Geist 600 · 19/1.34</span><span class="t-d3">Ringkasan pembayaran</span></div>
+    <div class="type-row"><span class="type-spec">price · Geist 700 · 21 · tabular</span><span class="t-pr">Rp 1.250.000</span></div>
+    <div class="type-row"><span class="type-spec">body · Geist 400 · 15/1.7</span><span class="t-b1">Harga pada pesanan ini adalah salinan saat order dibuat.</span></div>
+    <div class="type-row"><span class="type-spec">body-sm · Geist 400 · 13.5/1.55</span><span class="t-b2">Stok tersisa 3 — pesan sekarang sebelum kehabisan.</span></div>
+    <div class="type-row"><span class="type-spec">label · Geist Mono 400 · 10.5 · .1em</span><span class="t-lb">ELEKTRONIK</span></div>
+  </div>
+  <p style="font-size:14.5px;color:var(--muted);margin-top:16px">Aturan pakai: hanya <b>satu</b> display/1 per halaman. Karena semua memakai satu keluarga, <b>tracking yang membedakan peran</b> — makin besar ukurannya makin rapat (−.042em di 42px, nyaris nol di 15px), dan label mono justru direnggangkan +.1em. Tanpa penyesuaian ini, judul Geist akan terlihat longgar dan lemah. Teks berjalan berhenti di 76 karakter, judul dapat <code>text-wrap: balance</code>, dan semua kolom angka wajib <code>font-variant-numeric: tabular-nums lining-nums</code> — tanpa itu kolom total di tabel order akan bergoyang.</p>
+</section>
+
+<section id="color">
+  <h3><span class="n">2.3</span> Warna</h3>
+  <p class="lede">Latar hampir putih, garis setipis mungkin, dan satu indigo terang yang membawa seluruh beban aksi. Netral condong sedikit ke biru agar menyatu dengan warna merek, bukan abu-abu murni.</p>
+
+  <h4>Merek — satu-satunya warna yang berarti "aksi"</h4>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:var(--brand-700)"></div><div class="meta"><b>brand-700</b><span>#3A48D6 · hover</span></div></div>
+    <div class="sw"><div class="chip" style="background:var(--brand-600)"></div><div class="meta"><b>brand-600</b><span>#4A5CF2 · primary</span></div></div>
+    <div class="sw"><div class="chip" style="background:var(--brand-300)"></div><div class="meta"><b>brand-300</b><span>#B9C0FB · garis aktif</span></div></div>
+    <div class="sw"><div class="chip" style="background:var(--brand-100)"></div><div class="meta"><b>brand-100</b><span>#E4E7FE · isian lembut</span></div></div>
+    <div class="sw"><div class="chip" style="background:var(--brand-50)"></div><div class="meta"><b>brand-50</b><span>#F3F4FE · latar thumbnail</span></div></div>
+  </div>
+
+  <h4>Netral</h4>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:var(--ink)"></div><div class="meta"><b>ink</b><span>#1D1F27 · teks utama</span></div></div>
+    <div class="sw"><div class="chip" style="background:var(--ink-2)"></div><div class="meta"><b>ink-2</b><span>#43464F · label</span></div></div>
+    <div class="sw"><div class="chip" style="background:var(--muted)"></div><div class="meta"><b>muted</b><span>#767A86 · teks sekunder</span></div></div>
+    <div class="sw"><div class="chip" style="background:var(--line)"></div><div class="meta"><b>line</b><span>#E6E7EE · garis</span></div></div>
+    <div class="sw"><div class="chip" style="background:var(--surface-2)"></div><div class="meta"><b>surface-2</b><span>#F3F4F8 · isian</span></div></div>
+    <div class="sw"><div class="chip" style="background:var(--ground);box-shadow:inset 0 0 0 1px var(--line)"></div><div class="meta"><b>ground</b><span>#FBFBFD · latar halaman</span></div></div>
+    <div class="sw"><div class="chip" style="background:var(--surface);box-shadow:inset 0 0 0 1px var(--line)"></div><div class="meta"><b>surface</b><span>#FFFFFF · kartu</span></div></div>
+  </div>
+
+  <h4>Semantik — terikat pada arti, bukan pada suasana</h4>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:var(--ok)"></div><div class="meta"><b>ok</b><span>#0F7E5A · stok aman, PAID</span></div></div>
+    <div class="sw"><div class="chip" style="background:var(--warn)"></div><div class="meta"><b>warn</b><span>#8F6100 · menipis, PENDING</span></div></div>
+    <div class="sw"><div class="chip" style="background:var(--bad)"></div><div class="meta"><b>bad</b><span>#C2372E · habis, CANCELLED</span></div></div>
+  </div>
+  <p style="font-size:14.5px;color:var(--muted);margin-top:14px">Ketiga warna semantik sengaja lebih gelap dari warna "cerah" biasanya — bukan untuk terlihat berat, tapi karena ketiganya dipakai sebagai <b>teks</b> di atas <code>surface</code> dan harus lolos kontras 4.5:1. Latar pilnya yang ringan (<code>-soft</code>), bukan tulisannya.</p>
+</section>
+
+<section id="space">
+  <h3><span class="n">2.4</span> Ruang, sudut, dan bayangan</h3>
+  <div class="grid g2">
+    <div class="panel">
+      <h4 style="margin-top:0">Skala ruang — kelipatan 4</h4>
+      <div class="scale-bar">
+        <div><i style="width:4px"></i>4</div>
+        <div><i style="width:8px"></i>8</div>
+        <div><i style="width:12px"></i>12</div>
+        <div><i style="width:16px"></i>16</div>
+        <div><i style="width:24px"></i>24</div>
+        <div><i style="width:32px"></i>32</div>
+        <div><i style="width:48px"></i>48</div>
+        <div><i style="width:64px"></i>64</div>
+      </div>
+      <p style="font-size:14px;color:var(--muted);margin:0">Jarak antar elemen sekelompok diatur <code>gap</code> pada flex/grid induknya, bukan margin per anak. Padding kartu: 16 di ponsel, 24 di desktop. Kalau ragu, ambil yang lebih longgar — halaman ini menganut ruang kosong sebagai bagian desain.</p>
+    </div>
+    <div class="panel">
+      <h4 style="margin-top:0">Sudut &amp; ketinggian</h4>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+        <div style="flex:1;min-width:70px;height:52px;border-radius:5px;background:var(--surface-2);display:grid;place-items:center;font-family:var(--f-mono);font-size:10px;color:var(--muted)">5 · input</div>
+        <div style="flex:1;min-width:70px;height:52px;border-radius:9px;background:var(--surface-2);display:grid;place-items:center;font-family:var(--f-mono);font-size:10px;color:var(--muted)">9 · tombol</div>
+        <div style="flex:1;min-width:70px;height:52px;border-radius:16px;background:var(--surface-2);display:grid;place-items:center;font-family:var(--f-mono);font-size:10px;color:var(--muted)">16 · kartu</div>
+        <div style="flex:1;min-width:70px;height:52px;border-radius:999px;background:var(--surface-2);display:grid;place-items:center;font-family:var(--f-mono);font-size:10px;color:var(--muted)">999 · pil</div>
+      </div>
+      <p style="font-size:14px;color:var(--muted);margin:0">Bayangan hampir tidak dipakai: kartu cukup dibedakan oleh garis setipis 1px. <code>shadow-2</code> hanya untuk yang benar-benar melayang di atas halaman — dropdown, toast, modal.</p>
+    </div>
+  </div>
+</section>
+
+<section id="comp">
+  <h3><span class="n">2.5</span> Komponen</h3>
+
+  <h4>Tombol</h4>
+  <div class="demo">
+    <button class="btn btn-primary">Pesan sekarang</button>
+    <button class="btn btn-secondary">Tambah ke keranjang</button>
+    <button class="btn btn-ghost">Lihat detail</button>
+    <button class="btn btn-danger">Batalkan pesanan</button>
+    <button class="btn btn-primary" disabled>Stok habis</button>
+    <button class="btn btn-secondary btn-sm">Ubah</button>
+  </div>
+  <p style="font-size:14.5px;color:var(--muted)">Satu primary per layar — pada halaman produk itu "Tambah ke keranjang", pada checkout itu "Pesan sekarang". Aksi merusak memakai outline merah, bukan isian merah: lebih jarang dipakai, tidak boleh menarik mata lebih dulu dari aksi utama.</p>
+
+  <h4>Field &amp; validasi</h4>
+  <div class="demo fields">
+    <div class="field">
+      <label for="ds-email">Email</label>
+      <input id="ds-email" type="email" value="rangga@contoh.id">
+    </div>
+    <div class="field invalid">
+      <label for="ds-pass">Kata sandi</label>
+      <input id="ds-pass" type="password" value="rahasia">
+      <span class="err">Password must be at least 8 characters</span>
+    </div>
+    <div class="field">
+      <label for="ds-phone">Nomor telepon</label>
+      <input id="ds-phone" type="tel" value="">
+      <span class="hint">Opsional</span>
+    </div>
+  </div>
+  <p style="font-size:14.5px;color:var(--muted)">Pesan error diambil <b>apa adanya dari <code>data</code> response 400</b> dan ditempel di field yang namanya cocok. Field opsional ditandai eksplisit dengan hint "Opsional" — jangan pakai tanda bintang pada yang wajib, karena mayoritas field memang wajib.</p>
+
+  <h4>Pil status — hanya untuk status order</h4>
+  <div class="demo">
+    <span class="pill p-warn">PENDING</span>
+    <span class="pill p-ok">PAID</span>
+    <span class="pill p-bad">CANCELLED</span>
+    <span class="pill p-neutral">Draf</span>
+  </div>
+  <p style="font-size:14.5px;color:var(--muted)">Pil dipakai <b>hanya untuk status order</b> — nilai yang jumlahnya terbatas dan berubah seiring waktu. Stok <b>tidak</b> memakai pil; ia hanya teks (lihat kartu produk di bawah), karena stok sudah punya angka yang jadi isi utamanya dan tidak perlu wadah tambahan. Menahan pil untuk satu peran saja membuatnya tetap berarti: begitu mata melihat pil, itu pasti status pesanan.</p>
+
+  <h4>Kartu produk</h4>
+  <div class="demo">
+    <article class="pcard">
+      <div class="thumb">KM</div>
+      <div class="pb">
+        <span class="cat">Elektronik</span>
+        <p class="nm">Keyboard Mekanik 65% Hot-swap</p>
+        <span class="pr">Rp 1.250.000</span>
+        <div class="ft"><span class="stk">Stok 24</span><button class="btn btn-secondary btn-sm">Tambah</button></div>
+      </div>
+    </article>
+    <article class="pcard">
+      <div class="thumb" style="background:var(--warn-soft);color:var(--warn)">TK</div>
+      <div class="pb">
+        <span class="cat">Dapur</span>
+        <p class="nm">Teko Listrik Stainless 1.7L</p>
+        <span class="pr">Rp 289.000</span>
+        <div class="ft"><span class="stk low">Tersisa 3</span><button class="btn btn-secondary btn-sm">Tambah</button></div>
+      </div>
+    </article>
+    <article class="pcard">
+      <div class="thumb" style="background:var(--surface-2);color:var(--muted)">SP</div>
+      <div class="pb">
+        <span class="cat">Audio</span>
+        <p class="nm">Speaker Bluetooth Tahan Air</p>
+        <span class="pr" style="color:var(--muted)">Rp 675.000</span>
+        <div class="ft"><span class="stk out">Habis</span><button class="btn btn-secondary btn-sm" disabled>Tambah</button></div>
+      </div>
+    </article>
+  </div>
+  <p style="font-size:14.5px;color:var(--muted)">Thumbnail adalah dua huruf pertama nama produk, diset Geist 600 dengan tracking rapat di atas warna kategori — inilah yang membuat katalog tanpa foto tetap punya wajah. Produk habis kehilangan warnanya: thumbnail jadi netral, harga jadi abu-abu, tombol mati. Kartu tidak pernah menyembunyikan produk habis; pengunjung berhak tahu barangnya ada tapi sedang kosong.</p>
+
+  <h4>Empat wajah setiap halaman</h4>
+  <div class="demo" style="align-items:stretch">
+    <div class="state">
+      <div style="display:flex;flex-direction:column;gap:10px;text-align:left">
+        <div class="skel t"></div><div class="skel"></div><div class="skel s"></div>
+      </div>
+      <p style="margin-top:18px;margin-bottom:0">Memuat — kerangka seukuran isi aslinya, bukan spinner di tengah layar</p>
+    </div>
+    <div class="state">
+      <div class="ic">0</div>
+      <h5>Keranjang masih kosong</h5>
+      <p>Belum ada barang di sini. Katalog menunggu.</p>
+      <button class="btn btn-primary btn-sm">Lihat katalog</button>
+    </div>
+    <div class="state">
+      <div class="ic" style="background:var(--bad-soft);color:var(--bad)">!</div>
+      <h5>Gagal memuat katalog</h5>
+      <p>Sambungan ke server terputus. Coba lagi sebentar.</p>
+      <button class="btn btn-secondary btn-sm">Coba lagi</button>
+    </div>
+  </div>
+  <p style="font-size:14.5px;color:var(--muted)">Halaman kosong selalu menawarkan jalan keluar, bukan sekadar mengabarkan kekosongan. Halaman error menjelaskan apa yang gagal dan menyediakan tombol ulang — tidak pernah menampilkan pesan mentah dari server.</p>
+
+  <h4>Toast</h4>
+  <div class="demo">
+    <div class="toast">
+      <span class="ic" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6.2 4.6 8.8 10 3.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <div class="tx"><b>Pesanan dibuat</b><span>Nomor 8f3a·c210 · total Rp 1.539.000</span></div>
+      <button class="x" aria-label="Tutup"><svg viewBox="0 0 12 12" fill="none"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="toast bad">
+      <span class="ic" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M6 2.8v3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="6" cy="9" r="1.05" fill="currentColor"/></svg></span>
+      <div class="tx"><b>Stok tidak cukup</b><span>Teko Listrik tinggal 3. Kurangi jumlahnya untuk lanjut.</span></div>
+      <button class="x" aria-label="Tutup"><svg viewBox="0 0 12 12" fill="none"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </div>
+  </div>
+  <p style="font-size:14.5px;color:var(--muted)">Warna dibawa oleh <b>ikon bulat kecil</b>, bukan oleh garis tepi berwarna: bentuk ikonnya (centang vs seru) sudah membedakan sukses dari gagal bahkan tanpa warna, sementara badan toast tetap netral seperti kartu lain di halaman. Toast hanya untuk hasil dari aksi yang <b>pengguna sengaja lakukan</b> — kegagalan memuat data bukan toast, itu keadaan halaman. Toast sukses hilang sendiri setelah 4 detik; toast gagal menunggu ditutup.</p>
+</section>
+
+<section id="domain">
+  <h3><span class="n">2.6</span> Pola khas ShopNest</h3>
+  <p class="lede">Tiga aturan yang tidak bisa ditebak dari komponen generik — semuanya lahir dari cara backend ini bekerja.</p>
+
+  <h4>Uang</h4>
+  <pre><i>// satu-satunya tempat harga diformat di seluruh aplikasi</i>
+<b>export const</b> rupiah = (n: number) =&gt;
+  <b>new</b> Intl.NumberFormat(<em>"id-ID"</em>, {
+    style: <em>"currency"</em>, currency: <em>"IDR"</em>,
+    minimumFractionDigits: 0, maximumFractionDigits: 0
+  }).format(n)          <i>// 1250000 → "Rp 1.250.000"</i></pre>
+  <div class="call warn">
+    <div class="body">
+      <span class="ttl">Jangan pernah menghitung total yang mengikat di klien</span>
+      <p>Backend menyimpan <code>numeric(15,2)</code> dan menjumlahkan dengan <code>BigDecimal</code>. JavaScript menjumlahkan dengan float biner. Total di halaman keranjang adalah <b>perkiraan untuk pengguna</b>; angka yang berlaku adalah <code>totalAmount</code> yang dikembalikan <code>POST /api/orders</code>. Tampilkan angka dari server itu di layar konfirmasi, jangan tampilkan hasil hitungan sendiri.</p>
+    </div>
+  </div>
+
+  <h4>Stok</h4>
+  <div class="tbl-wrap" style="margin-bottom:18px">
+    <table>
+      <thead><tr><th class="mono">stock</th><th>Teks</th><th>Tampilan di kartu</th><th>Perilaku</th></tr></thead>
+      <tbody>
+        <tr><td class="mono num">0</td><td>Habis</td><td><span class="stk out">Habis</span></td><td>Tombol tambah mati, kartu kehilangan warna</td></tr>
+        <tr><td class="mono num">1–5</td><td>Tersisa <i>n</i></td><td><span class="stk low">Tersisa 3</span></td><td>Jumlah di keranjang dibatasi sampai <i>n</i></td></tr>
+        <tr><td class="mono num">&gt; 5</td><td>Stok <i>n</i></td><td><span class="stk">Stok 24</span></td><td>Normal</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:14.5px;color:var(--muted)">Angka stok di keranjang selalu basi — ia diambil saat produk dilihat, bukan saat checkout. Karena itu <b>muat ulang setiap produk di halaman checkout</b> dan tolak lebih awal, agar pengguna tidak menemui kegagalan setelah menekan tombol pesan.</p>
+
+  <h4>Order</h4>
+  <ul class="plain">
+    <li><b>Harga di detail order tidak boleh ditautkan ke katalog.</b> <code>order_items.price</code> adalah salinan saat transaksi. Beri keterangan kecil "harga saat pemesanan" agar pengguna tidak bingung melihat selisih dengan halaman produk.</li>
+    <li><b>Tombol batal hanya muncul pada <code>PENDING</code>.</b> Status lain tidak menampilkannya sama sekali — bukan menampilkannya dalam keadaan mati.</li>
+    <li><b><code>createdAt</code> datang tanpa zona waktu</b> (<code>LocalDateTime</code> → <code>"2026-09-11T10:14:03.221"</code>). Jangan serahkan ke <code>new Date()</code> begitu saja dan berharap benar; perlakukan sebagai waktu lokal server dan tampilkan apa adanya dalam format Indonesia.</li>
+    <li><b>ID order adalah UUID.</b> Jangan tampilkan utuh di daftar — potong delapan karakter pertama dan sediakan salin-ke-clipboard di halaman detail.</li>
+  </ul>
+</section>
+
+<section id="a11y">
+  <h3><span class="n">2.7</span> Responsif &amp; aksesibilitas</h3>
+  <div class="grid g2">
+    <div class="panel">
+      <h4 style="margin-top:0">Titik henti</h4>
+      <ul class="plain" style="margin-bottom:0">
+        <li><b>375–639</b> — satu kolom; grid katalog 2 kolom; ringkasan checkout pindah ke atas tombol</li>
+        <li><b>640–1023</b> — katalog 3 kolom; filter jadi baris chip yang bisa digeser</li>
+        <li><b>≥ 1024</b> — katalog 4 kolom; filter jadi sidebar tetap; checkout dua kolom</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h4 style="margin-top:0">Wajib dipenuhi</h4>
+      <ul class="check" style="margin-bottom:0">
+        <li>Target sentuh minimal 44×44 — termasuk tombol +/− jumlah</li>
+        <li>Fokus terlihat di semua kontrol (garis <code>brand-600</code>, offset 2px)</li>
+        <li>Status tidak pernah hanya lewat warna: selalu ada teks</li>
+        <li>Perubahan jumlah keranjang diumumkan lewat <code>aria-live</code></li>
+        <li>Thumbnail huruf bukan informasi — beri <code>aria-hidden</code></li>
+        <li>Hormati <code>prefers-reduced-motion</code></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="tokens">
+  <h3><span class="n">2.8</span> File token siap pakai</h3>
+  <p class="lede">Salin ke <code>src/styles/tokens.css</code>. Ini sumber kebenaran; Tailwind atau CSS Modules hanya membacanya.</p>
+  <pre>@import url("https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&amp;family=Geist+Mono:wght@400;500&amp;display=swap");
+
+:root{
+  <i>/* merek */</i>
+  --brand-700:#3A48D6; --brand-600:#4A5CF2; --brand-300:#B9C0FB;
+  --brand-100:#E4E7FE; --brand-50:#F3F4FE; --on-brand:#FFFFFF;
+  <i>/* netral */</i>
+  --ink:#1D1F27; --ink-2:#43464F; --muted:#767A86;
+  --line:#E6E7EE; --line-soft:#F0F1F5;
+  --ground:#FBFBFD; --surface:#FFFFFF; --surface-2:#F3F4F8;
+  <i>/* semantik */</i>
+  --ok:#0F7E5A;  --ok-soft:#E2F4EC;
+  --warn:#8F6100; --warn-soft:#FAEFDA;
+  --bad:#C2372E; --bad-soft:#FBE7E5;
+  <i>/* bentuk */</i>
+  --r-sm:5px; --r-md:9px; --r-lg:16px;
+  --shadow-1:0 1px 2px rgba(29,31,39,.05);
+  --shadow-2:0 8px 28px -10px rgba(29,31,39,.16);
+  <i>/* huruf */</i>
+  --f-display:"Geist",system-ui,sans-serif;
+  --f-ui:"Geist",system-ui,sans-serif;
+  --f-mono:"Geist Mono",ui-monospace,monospace;
+  <i>/* tracking per ukuran — satu keluarga, peran dibedakan di sini */</i>
+  --tr-display:-.042em; --tr-heading:-.028em; --tr-body:-.005em; --tr-label:.1em;
+}
+
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --brand-700:#A9B3FF; --brand-600:#8E9AFB; --brand-300:#3B4483;
+    --brand-100:#242A52; --brand-50:#1C2040; --on-brand:#15161B;
+    --ink:#ECEDF2; --ink-2:#C7CAD4; --muted:#9AA0AE;
+    --line:#2F323C; --line-soft:#262932;
+    --ground:#15161B; --surface:#1C1E25; --surface-2:#24272F;
+    --ok:#55CC9C;  --ok-soft:#153429;
+    --warn:#E0AC53; --warn-soft:#372911;
+    --bad:#EC8B82; --bad-soft:#3B231F;
+  }
+}
+<i>/* ulangi blok gelap di :root[data-theme="dark"] agar tombol tema menang */</i></pre>
+  <p style="font-size:14.5px;color:var(--muted)">Di tema gelap, tangga merek <b>dibalik</b> — <code>brand-600</code> jadi terang agar tetap terbaca di atas latar gelap, dan <code>on-brand</code> jadi gelap karena tombol primary kini berlatar terang. Membalik hanya nilainya, bukan namanya, membuat semua komponen bekerja di kedua tema tanpa satu pun <code>if</code>.</p>
+</section>
+
+<footer>
+  <span>Kontrak dibaca dari branch dev · commit e7a5140</span>
+  <span>6 tabel · 4 service bisnis · 19 endpoint</span>
+  <span>Geist · Geist Mono</span>
+</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,807 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="ERD dan peta service ShopNest.">
+<style>:root{color-scheme:light dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>ShopNest Service Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+  :root{
+    --ground:#F1F4F3;
+    --surface:#FFFFFF;
+    --surface-2:#E7ECEA;
+    --ink:#101B19;
+    --muted:#576662;
+    --line:#C6D0CD;
+    --line-soft:#DCE3E1;
+    --accent:#0C6A60;
+    --accent-ink:#0C6A60;
+    --accent-soft:#D8E9E6;
+    --flag:#9C5411;
+    --flag-soft:#F5E4D2;
+    --shadow:0 1px 2px rgba(16,27,25,.06);
+    --font-d:"IBM Plex Sans Condensed",system-ui,-apple-system,"Segoe UI",sans-serif;
+    --font-b:"IBM Plex Serif",Georgia,"Times New Roman",serif;
+    --font-m:"IBM Plex Mono",ui-monospace,"Cascadia Mono","Consolas",monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0D1312;
+      --surface:#151D1B;
+      --surface-2:#1D2725;
+      --ink:#E4EBE9;
+      --muted:#8D9E9A;
+      --line:#2B3735;
+      --line-soft:#232E2C;
+      --accent:#4BC6B5;
+      --accent-ink:#4BC6B5;
+      --accent-soft:#123330;
+      --flag:#DFA262;
+      --flag-soft:#372715;
+      --shadow:0 1px 2px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0D1312;
+    --surface:#151D1B;
+    --surface-2:#1D2725;
+    --ink:#E4EBE9;
+    --muted:#8D9E9A;
+    --line:#2B3735;
+    --line-soft:#232E2C;
+    --accent:#4BC6B5;
+    --accent-ink:#4BC6B5;
+    --accent-soft:#123330;
+    --flag:#DFA262;
+    --flag-soft:#372715;
+    --shadow:0 1px 2px rgba(0,0,0,.4);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--ground);
+    color:var(--ink);
+    font-family:var(--font-b);
+    font-size:15px;
+    line-height:1.65;
+    padding-block:0 56px;
+    padding-left:20px;
+    padding-right:20px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1240px;margin:0 auto}
+
+  /* ---------- masthead ---------- */
+  header.masthead{
+    padding-block:48px 34px;
+    border-bottom:2px solid var(--ink);
+    display:flex;
+    flex-wrap:wrap;
+    gap:28px 40px;
+    align-items:flex-end;
+  }
+  .mast-main{flex:1 1 440px;min-width:0}
+  .eyebrow{
+    font-family:var(--font-m);
+    font-size:11px;
+    font-weight:500;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent-ink);
+    margin:0 0 14px;
+  }
+  h1{
+    font-family:var(--font-d);
+    font-weight:700;
+    font-size:clamp(38px,6vw,60px);
+    line-height:1.02;
+    letter-spacing:-.015em;
+    margin:0;
+    text-wrap:balance;
+  }
+  .standfirst{
+    font-size:17px;
+    color:var(--muted);
+    margin:16px 0 0;
+    max-width:62ch;
+  }
+  .standfirst em{color:var(--ink);font-style:italic}
+  .mast-facts{
+    flex:0 1 300px;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:14px 20px;
+    font-family:var(--font-m);
+  }
+  .fact dt{
+    font-size:10px;
+    letter-spacing:.11em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin:0 0 2px;
+  }
+  .fact dd{margin:0;font-size:14px;font-weight:500;font-variant-numeric:tabular-nums}
+
+  /* ---------- sections ---------- */
+  section{padding-block:46px 0}
+  .sec-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-bottom:6px}
+  h2{
+    font-family:var(--font-d);
+    font-weight:600;
+    font-size:27px;
+    letter-spacing:-.01em;
+    margin:0;
+  }
+  .sec-num{
+    font-family:var(--font-m);
+    font-size:12px;
+    font-weight:600;
+    color:var(--accent-ink);
+    letter-spacing:.08em;
+  }
+  .sec-note{color:var(--muted);max-width:70ch;margin:10px 0 22px;font-size:15px}
+  .sec-note code,.caption code{font-family:var(--font-m);font-size:.88em;background:var(--surface-2);padding:1px 5px;border-radius:3px}
+
+  /* ---------- diagram frames ---------- */
+  .scroller{
+    overflow-x:auto;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:4px;
+    box-shadow:var(--shadow);
+    padding:6px;
+  }
+  .scroller svg{display:block;height:auto;max-width:100%}
+  #topology{width:100%;min-width:700px}
+  #erd{width:1200px;max-width:none;min-width:1200px}
+  .caption{
+    font-size:13.5px;
+    color:var(--muted);
+    margin:14px 0 0;
+    max-width:78ch;
+  }
+  .scroll-hint{
+    display:none;
+    font-family:var(--font-m);
+    font-size:10.5px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin:0 0 8px;
+  }
+
+  /* ---------- svg typography ---------- */
+  .s-title{font-family:var(--font-m);font-size:12.5px;font-weight:600;fill:var(--ink)}
+  .s-sub{font-family:var(--font-m);font-size:10px;fill:var(--muted)}
+  .s-lane{font-family:var(--font-m);font-size:11px;font-weight:600;letter-spacing:.09em;fill:var(--accent-ink)}
+  .s-col{font-family:var(--font-m);font-size:11.5px;fill:var(--ink)}
+  .s-type{font-family:var(--font-m);font-size:10px;fill:var(--muted)}
+  .s-edge{font-family:var(--font-m);font-size:9.5px;fill:var(--muted)}
+  .s-badge{font-family:var(--font-m);font-size:8.5px;font-weight:600;letter-spacing:.04em}
+  .fill-surface{fill:var(--surface)}
+  .fill-surface2{fill:var(--surface-2)}
+  .fill-accent-soft{fill:var(--accent-soft)}
+  .fill-flag-soft{fill:var(--flag-soft)}
+  .fill-ground{fill:var(--ground)}
+  .stroke-line{stroke:var(--line);fill:none}
+  .stroke-soft{stroke:var(--line-soft);fill:none}
+  .stroke-accent{stroke:var(--accent);fill:none}
+  .stroke-flag{stroke:var(--flag);fill:none}
+  .fill-accent{fill:var(--accent)}
+  .fill-flag{fill:var(--flag)}
+  .fill-ink{fill:var(--ink)}
+  .fill-muted{fill:var(--muted)}
+  .on-accent{fill:var(--surface)}
+  :root[data-theme="dark"] .on-accent{fill:#0D1312}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .on-accent{fill:#0D1312}}
+
+  /* ---------- legend ---------- */
+  .legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px 26px;
+    margin:16px 0 0;
+    font-family:var(--font-m);
+    font-size:11.5px;
+    color:var(--muted);
+  }
+  .legend span{display:inline-flex;align-items:center;gap:9px}
+  .legend i{display:inline-block;width:26px;height:0;border-top-width:2px;flex:none}
+  .lg-fk{border-top-style:solid;border-color:var(--accent)}
+  .lg-ref{border-top-style:dashed;border-color:var(--flag)}
+  .lg-chip{
+    width:auto;height:auto;border:0;
+    font-style:normal;font-size:8.5px;font-weight:600;
+    padding:2px 5px;border-radius:2px;
+  }
+  .chip-pk{background:var(--accent);color:var(--surface)}
+  :root[data-theme="dark"] .chip-pk{color:#0D1312}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .chip-pk{color:#0D1312}}
+  .chip-fk{background:var(--accent-soft);color:var(--accent-ink)}
+  .chip-ext{background:var(--flag-soft);color:var(--flag)}
+
+  /* ---------- service reference ---------- */
+  .svc-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(290px,1fr));
+    gap:18px;
+    margin-top:4px;
+  }
+  .svc{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:4px;
+    box-shadow:var(--shadow);
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  .svc-top{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:12px;
+    padding:13px 16px;
+    border-bottom:1px solid var(--line-soft);
+    background:var(--surface-2);
+  }
+  .svc-name{font-family:var(--font-m);font-size:14px;font-weight:600;letter-spacing:-.01em}
+  .svc-port{font-family:var(--font-m);font-size:11.5px;color:var(--accent-ink);font-variant-numeric:tabular-nums}
+  .svc-role{
+    padding:12px 16px 2px;
+    font-size:14px;
+    color:var(--muted);
+    line-height:1.55;
+  }
+  .svc-schema{
+    font-family:var(--font-m);
+    font-size:10.5px;
+    letter-spacing:.06em;
+    color:var(--muted);
+    padding:8px 16px 0;
+  }
+  .svc-schema b{color:var(--ink);font-weight:500}
+  ul.routes{list-style:none;margin:12px 0 0;padding:0}
+  ul.routes li{
+    display:flex;
+    gap:10px;
+    align-items:baseline;
+    padding:7px 16px;
+    border-top:1px solid var(--line-soft);
+    font-family:var(--font-m);
+    font-size:11.5px;
+    line-height:1.45;
+  }
+  .verb{
+    flex:none;
+    min-width:52px;
+    font-weight:600;
+    font-size:10px;
+    letter-spacing:.05em;
+    color:var(--accent-ink);
+  }
+  .verb.del{color:var(--flag)}
+  .path{flex:1 1 auto;min-width:0;word-break:break-word}
+  .path small{display:block;font-size:10.5px;color:var(--muted);letter-spacing:0;font-weight:400;margin-top:1px}
+  .tag{
+    flex:none;
+    font-size:8.5px;
+    font-weight:600;
+    letter-spacing:.05em;
+    padding:2px 5px;
+    border-radius:2px;
+    background:var(--surface-2);
+    color:var(--muted);
+    align-self:center;
+  }
+  .tag.pub{background:var(--accent-soft);color:var(--accent-ink)}
+  .tag.feign{background:var(--flag-soft);color:var(--flag)}
+  .svc-foot{
+    margin-top:auto;
+    padding:11px 16px;
+    border-top:1px solid var(--line-soft);
+    font-family:var(--font-m);
+    font-size:10.5px;
+    color:var(--muted);
+  }
+  .svc-foot b{color:var(--flag);font-weight:600}
+
+  /* ---------- flow ---------- */
+  .flow{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:1px;
+    background:var(--line-soft);
+    border:1px solid var(--line);
+    border-radius:4px;
+    overflow:hidden;
+  }
+  .step{background:var(--surface);padding:16px 18px 18px}
+  .step-n{
+    font-family:var(--font-m);
+    font-size:10px;
+    font-weight:600;
+    letter-spacing:.12em;
+    color:var(--accent-ink);
+    display:block;
+    margin-bottom:7px;
+  }
+  .step h3{font-family:var(--font-m);font-size:12.5px;font-weight:600;margin:0 0 6px;letter-spacing:-.01em}
+  .step p{margin:0;font-size:13.5px;color:var(--muted);line-height:1.5}
+
+  footer{
+    margin-top:52px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    font-family:var(--font-m);
+    font-size:11px;
+    color:var(--muted);
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px 22px;
+  }
+
+  @media (max-width:640px){
+    header.masthead{padding-block:34px 26px}
+    .mast-facts{flex-basis:100%}
+    .scroll-hint{display:block}
+    section{padding-block:36px 0}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="mast-main">
+      <p class="eyebrow">ShopNest · branch dev · e7a5140</p>
+      <h1>ShopNest Service Atlas</h1>
+      <p class="standfirst">Enam tabel, empat service bisnis, dan <em>nol foreign key antar service</em>. Peta ini membaca kode yang ada di repo — entity JPA, controller, Feign client — bukan rencana di atas kertas.</p>
+    </div>
+    <dl class="mast-facts">
+      <div class="fact"><dt>Service bisnis</dt><dd>4</dd></div>
+      <div class="fact"><dt>Infra service</dt><dd>3</dd></div>
+      <div class="fact"><dt>Tabel</dt><dd>6</dd></div>
+      <div class="fact"><dt>Schema DB</dt><dd>4</dd></div>
+      <div class="fact"><dt>FK nyata</dt><dd>2</dd></div>
+      <div class="fact"><dt>Referensi lintas service</dt><dd>3</dd></div>
+    </dl>
+  </header>
+
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">I</span>
+      <h2>Peta service</h2>
+    </div>
+    <p class="sec-note">Gateway adalah satu-satunya pintu dari luar. Ia memverifikasi JWT, lalu meneruskan identitas sebagai header <code>X-User-Id</code> / <code>X-User-Email</code> / <code>X-User-Role</code> — service percaya pada gateway, bukan pada client. Panggilan antar service (order → product saat checkout) lewat OpenFeign dan tidak menyentuh gateway sama sekali.</p>
+    <p class="scroll-hint">← geser untuk melihat penuh →</p>
+    <div class="scroller">
+      <svg id="topology" viewBox="0 0 1000 522" role="img" aria-label="Diagram topologi service ShopNest: client ke api-gateway, lalu ke auth, user, product, dan order service, semuanya di atas satu PostgreSQL dengan schema terpisah.">
+        <defs>
+          <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" class="fill-muted"/>
+          </marker>
+          <marker id="arw-flag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" class="fill-flag"/>
+          </marker>
+        </defs>
+
+        <!-- client -->
+        <rect x="400" y="16" width="200" height="38" rx="3" class="fill-ground stroke-line" stroke-dasharray="4 3"/>
+        <text x="500" y="40" text-anchor="middle" class="s-title fill-muted">Client / Postman</text>
+        <path d="M500,54 V84" class="stroke-line" stroke-width="1.5" marker-end="url(#arw)"/>
+
+        <!-- gateway -->
+        <rect x="340" y="86" width="320" height="58" rx="3" class="fill-accent-soft stroke-accent" stroke-width="1.5"/>
+        <text x="500" y="110" text-anchor="middle" class="s-title">api-gateway</text>
+        <text x="500" y="127" text-anchor="middle" class="s-sub">:8080 · verifikasi JWT · satu-satunya entry publik</text>
+
+        <!-- bus -->
+        <path d="M500,144 V172" class="stroke-line" stroke-width="1.5"/>
+        <path d="M130,172 H844" class="stroke-line" stroke-width="1.5"/>
+        <path d="M130,172 V194" class="stroke-line" stroke-width="1.5" marker-end="url(#arw)"/>
+        <path d="M368,172 V194" class="stroke-line" stroke-width="1.5" marker-end="url(#arw)"/>
+        <path d="M606,172 V194" class="stroke-line" stroke-width="1.5" marker-end="url(#arw)"/>
+        <path d="M844,172 V194" class="stroke-line" stroke-width="1.5" marker-end="url(#arw)"/>
+        <text x="516" y="164" class="s-edge">X-User-Id · X-User-Email · X-User-Role</text>
+
+        <!-- services -->
+        <rect x="30" y="196" width="200" height="66" rx="3" class="fill-surface2 stroke-line"/>
+        <text x="46" y="220" class="s-title">auth-service</text>
+        <text x="46" y="238" class="s-sub">:8081 · register, login</text>
+        <text x="46" y="252" class="s-sub">terbitkan JWT</text>
+
+        <rect x="268" y="196" width="200" height="66" rx="3" class="fill-surface2 stroke-line"/>
+        <text x="284" y="220" class="s-title">user-service</text>
+        <text x="284" y="238" class="s-sub">:8082 · profil</text>
+        <text x="284" y="252" class="s-sub">&amp; alamat kirim</text>
+
+        <rect x="506" y="196" width="200" height="66" rx="3" class="fill-surface2 stroke-line"/>
+        <text x="522" y="220" class="s-title">product-service</text>
+        <text x="522" y="238" class="s-sub">:8083 · katalog</text>
+        <text x="522" y="252" class="s-sub">&amp; stok</text>
+
+        <rect x="744" y="196" width="200" height="66" rx="3" class="fill-surface2 stroke-line"/>
+        <text x="760" y="220" class="s-title">order-service</text>
+        <text x="760" y="238" class="s-sub">:8084 · checkout</text>
+        <text x="760" y="252" class="s-sub">&amp; riwayat order</text>
+
+        <!-- feign -->
+        <path d="M824,262 C824,298 626,298 626,262" class="stroke-flag" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arw-flag)"/>
+        <text x="725" y="314" text-anchor="middle" class="s-edge fill-flag">OpenFeign · getProduct + reduceStock</text>
+
+        <!-- db -->
+        <rect x="30" y="330" width="914" height="64" rx="3" class="fill-surface stroke-line" stroke-width="1.5"/>
+        <path d="M130,262 V330" class="stroke-soft" stroke-width="1.5"/>
+        <path d="M368,262 V330" class="stroke-soft" stroke-width="1.5"/>
+        <path d="M606,262 V330" class="stroke-soft" stroke-width="1.5"/>
+        <path d="M844,262 V330" class="stroke-soft" stroke-width="1.5"/>
+        <text x="46" y="352" class="s-title">PostgreSQL — satu instance, satu schema per service</text>
+        <text x="46" y="378" class="s-sub">auth_service</text>
+        <text x="284" y="378" class="s-sub">user_service</text>
+        <text x="522" y="378" class="s-sub">product_service</text>
+        <text x="760" y="378" class="s-sub">order_service</text>
+
+        <!-- infra -->
+        <rect x="30" y="430" width="440" height="60" rx="3" class="fill-ground stroke-line" stroke-dasharray="4 3"/>
+        <text x="46" y="454" class="s-title">eureka-server</text>
+        <text x="46" y="472" class="s-sub">:8761 · semua service mendaftar di sini; Feign resolve nama lewat registry</text>
+
+        <rect x="504" y="430" width="440" height="60" rx="3" class="fill-ground stroke-line" stroke-dasharray="4 3"/>
+        <text x="520" y="454" class="s-title">config-server</text>
+        <text x="520" y="472" class="s-sub">:8888 · konfigurasi bersama dari config-repo saat startup</text>
+      </svg>
+    </div>
+    <p class="caption">Hanya <code>/api/auth/**</code> dan <code>/docs/specs/**</code> yang lolos tanpa token; sisanya ditolak gateway sebelum menyentuh service mana pun. Kotak bergaris putus-putus adalah infrastruktur — bukan jalur request.</p>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">II</span>
+      <h2>ERD — enam tabel, empat schema</h2>
+    </div>
+    <p class="sec-note">Setiap tabel digambar di dalam jalur service pemiliknya, karena di situlah letak batasannya: foreign key hanya boleh ada di dalam satu jalur. Kolom seperti <code>orders.user_id</code> memang menunjuk ke <code>auth_service.users</code>, tapi tidak ada constraint yang menjaganya — relasi itu dipegang oleh API dan disiplin kode, bukan database.</p>
+    <p class="scroll-hint">← geser untuk melihat penuh →</p>
+    <div class="scroller">
+      <svg id="erd" viewBox="0 0 1200 660" role="img" aria-label="ERD ShopNest: tabel users di schema auth_service; user_profiles dan addresses di user_service; products di product_service; orders dan order_items di order_service."></svg>
+    </div>
+    <div class="legend">
+      <span><i class="lg-fk"></i> Foreign key sungguhan (satu schema)</span>
+      <span><i class="lg-ref"></i> Referensi lintas service — tanpa FK</span>
+      <span><i class="lg-chip chip-pk">PK</i> Primary key</span>
+      <span><i class="lg-chip chip-fk">FK</i> Foreign key</span>
+      <span><i class="lg-chip chip-ext">REF</i> ID milik service lain</span>
+    </div>
+    <p class="caption">Semua tabel mewarisi <code>created_at</code> / <code>updated_at</code> dari <code>BaseEntity</code>, diisi otomatis oleh JPA auditing. Tabel dibuat Hibernate lewat <code>ddl-auto=update</code> saat service startup — <code>docs/schema.sql</code> adalah snapshot hasilnya, bukan migrasi.</p>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">III</span>
+      <h2>Perjalanan satu checkout</h2>
+    </div>
+    <p class="sec-note">Satu alur yang menyentuh hampir semua bagian sistem, dari token sampai snapshot harga.</p>
+    <div class="flow">
+      <div class="step">
+        <span class="step-n">LANGKAH 1</span>
+        <h3>POST /api/orders</h3>
+        <p>Client mengirim daftar <code>productId</code> + <code>quantity</code> beserta Bearer token ke gateway.</p>
+      </div>
+      <div class="step">
+        <span class="step-n">LANGKAH 2</span>
+        <h3>Gateway membuka token</h3>
+        <p>JWT diverifikasi, lalu <code>X-User-Id</code> ditempelkan ke request yang diteruskan ke order-service.</p>
+      </div>
+      <div class="step">
+        <span class="step-n">LANGKAH 3</span>
+        <h3>Feign → product-service</h3>
+        <p>Tiap item diambil detailnya, lalu stok dikurangi lewat <code>/stock/reduce</code>. Stok kurang → order gagal.</p>
+      </div>
+      <div class="step">
+        <span class="step-n">LANGKAH 4</span>
+        <h3>Snapshot, bukan referensi</h3>
+        <p>Nama dan harga produk disalin ke <code>order_items</code>. Harga katalog boleh berubah besok; struk tidak ikut berubah.</p>
+      </div>
+      <div class="step">
+        <span class="step-n">LANGKAH 5</span>
+        <h3>Order tersimpan PENDING</h3>
+        <p><code>total_amount</code> dijumlahkan dari subtotal item, status awal <code>PENDING</code>, menunggu <code>PAID</code> atau <code>CANCELLED</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">IV</span>
+      <h2>Fitur per service</h2>
+    </div>
+    <p class="sec-note">Endpoint persis seperti yang terdaftar di controller masing-masing. Path ditulis apa adanya — gateway meneruskan tanpa mengubah prefix.</p>
+    <div class="svc-grid">
+
+      <article class="svc">
+        <div class="svc-top"><span class="svc-name">auth-service</span><span class="svc-port">:8081</span></div>
+        <p class="svc-role">Pemilik identitas. Satu-satunya yang menyimpan password (BCrypt) dan menerbitkan JWT.</p>
+        <p class="svc-schema">SCHEMA <b>auth_service</b> · TABEL <b>users</b></p>
+        <ul class="routes">
+          <li><span class="verb">POST</span><span class="path">/api/auth/register<small>Daftar akun baru, langsung dapat token</small></span><span class="tag pub">PUBLIK</span></li>
+          <li><span class="verb">POST</span><span class="path">/api/auth/login<small>Tukar email + password dengan JWT</small></span><span class="tag pub">PUBLIK</span></li>
+          <li><span class="verb">GET</span><span class="path">/api/auth/validate<small>Cek token masih berlaku</small></span><span class="tag">BEARER</span></li>
+        </ul>
+        <p class="svc-foot">Enum <b>Role</b> — USER · ADMIN</p>
+      </article>
+
+      <article class="svc">
+        <div class="svc-top"><span class="svc-name">user-service</span><span class="svc-port">:8082</span></div>
+        <p class="svc-role">Data diri dan alamat kirim. Terpisah dari kredensial — profil boleh berubah tanpa menyentuh login.</p>
+        <p class="svc-schema">SCHEMA <b>user_service</b> · TABEL <b>user_profiles</b>, <b>addresses</b></p>
+        <ul class="routes">
+          <li><span class="verb">POST</span><span class="path">/api/users<small>Buat profil untuk user yang login</small></span><span class="tag">X-USER-ID</span></li>
+          <li><span class="verb">GET</span><span class="path">/api/users/{userId}</span></li>
+          <li><span class="verb">PUT</span><span class="path">/api/users/{userId}<small>Nama, telepon, tanggal lahir</small></span></li>
+          <li><span class="verb">POST</span><span class="path">/api/users/{userId}/addresses</span></li>
+          <li><span class="verb">GET</span><span class="path">/api/users/{userId}/addresses</span></li>
+          <li><span class="verb del">DELETE</span><span class="path">/api/users/{userId}/addresses/{addressId}</span></li>
+        </ul>
+        <p class="svc-foot">Satu profil per <b>user_id</b> (unique) · alamat boleh banyak, satu ditandai default</p>
+      </article>
+
+      <article class="svc">
+        <div class="svc-top"><span class="svc-name">product-service</span><span class="svc-port">:8083</span></div>
+        <p class="svc-role">Katalog dan pemilik stok. Satu-satunya yang boleh mengubah angka stok.</p>
+        <p class="svc-schema">SCHEMA <b>product_service</b> · TABEL <b>products</b></p>
+        <ul class="routes">
+          <li><span class="verb">POST</span><span class="path">/api/products</span></li>
+          <li><span class="verb">GET</span><span class="path">/api/products<small>?category= &amp;search= &amp;page= &amp;size= &amp;sort= — halaman default 10</small></span></li>
+          <li><span class="verb">GET</span><span class="path">/api/products/{id}</span><span class="tag feign">FEIGN</span></li>
+          <li><span class="verb">PUT</span><span class="path">/api/products/{id}</span></li>
+          <li><span class="verb del">DELETE</span><span class="path">/api/products/{id}</span></li>
+          <li><span class="verb">POST</span><span class="path">/api/products/{id}/stock/reduce<small>?quantity= — dipanggil order-service saat checkout</small></span><span class="tag feign">FEIGN</span></li>
+        </ul>
+        <p class="svc-foot">Harga pakai <b>BigDecimal</b>, bukan double · stok habis melempar InsufficientStockException</p>
+      </article>
+
+      <article class="svc">
+        <div class="svc-top"><span class="svc-name">order-service</span><span class="svc-port">:8084</span></div>
+        <p class="svc-role">Satu-satunya service yang memanggil service lain. Menyusun order dari katalog, lalu menyimpannya sebagai catatan yang berdiri sendiri.</p>
+        <p class="svc-schema">SCHEMA <b>order_service</b> · TABEL <b>orders</b>, <b>order_items</b></p>
+        <ul class="routes">
+          <li><span class="verb">POST</span><span class="path">/api/orders<small>Checkout — ambil produk, kurangi stok, simpan snapshot</small></span><span class="tag">X-USER-ID</span></li>
+          <li><span class="verb">GET</span><span class="path">/api/orders<small>Riwayat milik sendiri, terbaru dulu</small></span><span class="tag">X-USER-ID</span></li>
+          <li><span class="verb">GET</span><span class="path">/api/orders/{id}</span></li>
+          <li><span class="verb">PATCH</span><span class="path">/api/orders/{id}/cancel<small>Hanya dari status PENDING</small></span></li>
+        </ul>
+        <p class="svc-foot">Enum <b>OrderStatus</b> — PENDING · PAID · CANCELLED</p>
+      </article>
+
+    </div>
+  </section>
+
+  <footer>
+    <span>Sumber: entity JPA, controller, dan docs/schema.sql di branch dev</span>
+    <span>Commit e7a5140</span>
+    <span>Java 21 · Spring Boot 3.4.6 · Spring Cloud 2024.0.1</span>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var SVG = "http://www.w3.org/2000/svg";
+  var COL_W = 250, ROW_H = 22, HEAD_H = 32;
+
+  var lanes = [
+    {
+      schema: "auth_service", owner: "auth-service", x: 24,
+      tables: [{
+        name: "users", y: 84, cols: [
+          ["id", "uuid", "pk"],
+          ["email", "varchar", "uq"],
+          ["password", "varchar", ""],
+          ["name", "varchar", ""],
+          ["role", "enum", ""],
+          ["enabled", "boolean", ""],
+          ["created_at", "timestamp", ""],
+          ["updated_at", "timestamp", ""]
+        ]
+      }]
+    },
+    {
+      schema: "user_service", owner: "user-service", x: 324,
+      tables: [
+        {
+          name: "user_profiles", y: 84, cols: [
+            ["id", "uuid", "pk"],
+            ["user_id", "uuid · unique", "ext"],
+            ["full_name", "varchar", ""],
+            ["phone_number", "varchar", ""],
+            ["birth_date", "date", ""],
+            ["created_at", "timestamp", ""],
+            ["updated_at", "timestamp", ""]
+          ]
+        },
+        {
+          name: "addresses", y: 350, cols: [
+            ["id", "uuid", "pk"],
+            ["profile_id", "uuid", "fk"],
+            ["label", "varchar", ""],
+            ["street", "varchar", ""],
+            ["city", "varchar", ""],
+            ["postal_code", "varchar", ""],
+            ["is_default", "boolean", ""],
+            ["created_at", "timestamp", ""],
+            ["updated_at", "timestamp", ""]
+          ]
+        }
+      ]
+    },
+    {
+      schema: "product_service", owner: "product-service", x: 624,
+      tables: [{
+        name: "products", y: 84, cols: [
+          ["id", "uuid", "pk"],
+          ["name", "varchar", ""],
+          ["description", "text", ""],
+          ["price", "numeric(15,2)", ""],
+          ["stock", "integer", ""],
+          ["category", "varchar", ""],
+          ["created_at", "timestamp", ""],
+          ["updated_at", "timestamp", ""]
+        ]
+      }]
+    },
+    {
+      schema: "order_service", owner: "order-service", x: 924,
+      tables: [
+        {
+          name: "orders", y: 84, cols: [
+            ["id", "uuid", "pk"],
+            ["user_id", "uuid", "ext"],
+            ["status", "enum", ""],
+            ["total_amount", "numeric(15,2)", ""],
+            ["created_at", "timestamp", ""],
+            ["updated_at", "timestamp", ""]
+          ]
+        },
+        {
+          name: "order_items", y: 350, cols: [
+            ["id", "uuid", "pk"],
+            ["order_id", "uuid", "fk"],
+            ["product_id", "uuid", "ext"],
+            ["product_name", "varchar", ""],
+            ["price", "numeric(15,2)", ""],
+            ["quantity", "integer", ""],
+            ["subtotal", "numeric(15,2)", ""],
+            ["created_at", "timestamp", ""],
+            ["updated_at", "timestamp", ""]
+          ]
+        }
+      ]
+    }
+  ];
+
+  var BADGE = {
+    pk: { text: "PK", cls: "fill-accent", tcls: "on-accent" },
+    fk: { text: "FK", cls: "fill-accent-soft", tcls: "fill-accent" },
+    uq: { text: "UQ", cls: "fill-surface2", tcls: "fill-muted" },
+    ext: { text: "REF", cls: "fill-flag-soft", tcls: "fill-flag" }
+  };
+
+  function el(name, attrs, text) {
+    var n = document.createElementNS(SVG, name);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    if (text !== undefined) n.textContent = text;
+    return n;
+  }
+
+  var svg = document.getElementById("erd");
+  if (!svg) return;
+
+  // marker defs for the relationship lines
+  var defs = el("defs", {});
+  [["erd-arw", "fill-accent"], ["erd-arw-flag", "fill-flag"]].forEach(function (m) {
+    var mk = el("marker", {
+      id: m[0], viewBox: "0 0 10 10", refX: "9", refY: "5",
+      markerWidth: "6", markerHeight: "6", orient: "auto-start-reverse"
+    });
+    mk.appendChild(el("path", { d: "M0,0 L10,5 L0,10 z", "class": m[1] }));
+    defs.appendChild(mk);
+  });
+  svg.appendChild(defs);
+
+  // lane backdrops
+  lanes.forEach(function (lane) {
+    var last = lane.tables[lane.tables.length - 1];
+    var bottom = last.y + HEAD_H + last.cols.length * ROW_H;
+    svg.appendChild(el("rect", {
+      x: lane.x - 12, y: 44, width: COL_W + 24, height: bottom - 44 + 18,
+      rx: 4, "class": "fill-ground stroke-soft", "stroke-dasharray": "4 3"
+    }));
+    svg.appendChild(el("text", { x: lane.x - 2, y: 30, "class": "s-lane" }, lane.schema.toUpperCase()));
+    svg.appendChild(el("text", { x: lane.x - 2, y: 66, "class": "s-sub" }, "dimiliki " + lane.owner));
+  });
+
+  // tables
+  lanes.forEach(function (lane) {
+    lane.tables.forEach(function (t) {
+      var h = HEAD_H + t.cols.length * ROW_H;
+      var g = el("g", {});
+
+      g.appendChild(el("rect", {
+        x: lane.x, y: t.y, width: COL_W, height: h, rx: 3,
+        "class": "fill-surface stroke-line", "stroke-width": "1.5"
+      }));
+      g.appendChild(el("path", {
+        d: "M" + lane.x + "," + (t.y + HEAD_H) + " h" + COL_W,
+        "class": "stroke-line", "stroke-width": "1.5"
+      }));
+      g.appendChild(el("rect", {
+        x: lane.x, y: t.y, width: COL_W, height: HEAD_H,
+        "class": "fill-surface2"
+      }));
+      g.appendChild(el("text", {
+        x: lane.x + 12, y: t.y + 21, "class": "s-title"
+      }, t.name));
+
+      t.cols.forEach(function (c, i) {
+        var ry = t.y + HEAD_H + i * ROW_H;
+        var baseline = ry + 15;
+        if (i > 0) {
+          g.appendChild(el("path", {
+            d: "M" + (lane.x + 1) + "," + ry + " h" + (COL_W - 2),
+            "class": "stroke-soft"
+          }));
+        }
+        var b = BADGE[c[2]];
+        if (b) {
+          g.appendChild(el("rect", {
+            x: lane.x + 9, y: ry + 5, width: 24, height: 13, rx: 2, "class": b.cls
+          }));
+          g.appendChild(el("text", {
+            x: lane.x + 21, y: ry + 14.5, "text-anchor": "middle",
+            "class": "s-badge " + b.tcls
+          }, b.text));
+        }
+        g.appendChild(el("text", {
+          x: lane.x + 39, y: baseline, "class": "s-col"
+        }, c[0]));
+        g.appendChild(el("text", {
+          x: lane.x + COL_W - 10, y: baseline, "text-anchor": "end", "class": "s-type"
+        }, c[1]));
+      });
+
+      svg.appendChild(g);
+    });
+  });
+
+  // row-centre helper: y of the i-th column row (0-based) of a table
+  function rowY(tableY, i) { return tableY + HEAD_H + i * ROW_H + 11; }
+
+  var links = [
+    // real foreign keys, inside one schema
+    { d: "M324," + rowY(84, 0) + " H306 V" + rowY(350, 1) + " H324", cls: "stroke-accent", dash: null, label: null },
+    { d: "M924," + rowY(84, 0) + " H906 V" + rowY(350, 1) + " H924", cls: "stroke-accent", dash: null, label: null },
+    // cross-service references, no constraint
+    { d: "M274," + rowY(84, 0) + " H294 V" + rowY(84, 1) + " H324", cls: "stroke-flag", dash: "5 3", label: null },
+    { d: "M874," + rowY(84, 0) + " H894 V" + rowY(350, 2) + " H924", cls: "stroke-flag", dash: "5 3", label: null },
+    { d: "M149,292 V314 H1049 V248", cls: "stroke-flag", dash: "5 3", label: ["users.id → orders.user_id · tanpa FK, dijaga oleh kode", 600, 308] }
+  ];
+
+  links.forEach(function (l) {
+    var a = { d: l.d, "class": l.cls, "stroke-width": "1.5", "marker-end": l.cls === "stroke-accent" ? "url(#erd-arw)" : "url(#erd-arw-flag)" };
+    if (l.dash) a["stroke-dasharray"] = l.dash;
+    svg.appendChild(el("path", a));
+    if (l.label) {
+      svg.appendChild(el("text", {
+        x: l.label[1], y: l.label[2] - 6, "text-anchor": "middle", "class": "s-edge fill-flag"
+      }, l.label[0]));
+    }
+  });
+})();
+</script>
+</body>
+</html>
