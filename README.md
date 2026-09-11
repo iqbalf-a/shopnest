@@ -147,5 +147,6 @@ This project runs locally only — public deployment was attempted and paused af
 | [`docs/ROADMAP.md`](docs/ROADMAP.md) | Build phases, what's done, what's deliberately skipped |
 | [`docs/DOCKER-NOTES.md`](docs/DOCKER-NOTES.md) / [`docs/DOCKER-STEPS.md`](docs/DOCKER-STEPS.md) | Docker concepts + step-by-step containerization runbook |
 | [`docs/TESTING-NOTES.md`](docs/TESTING-NOTES.md) | Mockito setup, test structure, gotchas found |
+| [`docs/BUILD-ORDER.md`](docs/BUILD-ORDER.md) | The order the code was written in — which file first, which function first, and why (written in Indonesian) |
 | [`docs/INTERVIEW-QA.md`](docs/INTERVIEW-QA.md) | Anticipated interview Q&A about design decisions and trade-offs |
 | [`docs/FRONTEND-README.md`](docs/FRONTEND-README.md) | Handover package for building the frontend — product story, service atlas, PRD + design system (written in Indonesian) |

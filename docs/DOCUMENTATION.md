@@ -262,3 +262,6 @@ Ini penting untuk wawancara — menunjukkan kamu paham trade-off, bukan sekadar 
 ```
 
 Pola ini sama di semua service, jadi sekali paham satu service = paham semuanya.
+
+Struktur di atas adalah hasil akhirnya. Untuk **urutan membuatnya** — file mana dulu, fungsi apa dulu,
+dan kenapa entity selalu didahulukan sementara controller selalu terakhir — lihat [`BUILD-ORDER.md`](BUILD-ORDER.md).
