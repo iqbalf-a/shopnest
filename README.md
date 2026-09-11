@@ -51,7 +51,7 @@ A microservices-based e-commerce REST API built with **Spring Boot** and **Sprin
         All services register with Eureka Server (:8761) for discovery.
 ```
 
-- **Client → Gateway → Service**: the only externally-facing path. The gateway verifies JWTs and forwards identity as `X-User-Id` / `X-User-Email` / `X-User-Role` headers — services trust the gateway, not the client.
+- **Client → Gateway → Service**: the only externally-facing path. The gateway verifies JWTs and forwards identity as `X-User-Id` / `X-User-Email` / `X-User-Role` headers — services trust the gateway, not the client. Each service then applies its own authorization rules on top of that identity.
 - **Service → Service**: internal only (e.g. order-service calling product-service via OpenFeign during checkout), bypasses the gateway entirely.
 - **Database**: single PostgreSQL instance, one schema per service — an approximation of database-per-service, simple enough for local dev.
 
@@ -61,7 +61,10 @@ A microservices-based e-commerce REST API built with **Spring Boot** and **Sprin
 
 - **Service discovery** — Eureka (services register and look each other up by name)
 - **API Gateway** — Spring Cloud Gateway, `lb://` load-balanced routing, path predicates
-- **Perimeter security** — JWT verified once at the gateway; claims propagated via headers instead of re-verifying per service
+- **Perimeter authentication** — JWT verified once at the gateway; claims propagated as headers instead of re-verifying per service
+- **Per-service authorization** — the gateway proves *who* you are, each service decides *what you may do*: role checks on catalog writes, ownership checks on orders, profiles and addresses
+- **Trust boundary** — services trust `X-User-*` only because the gateway overwrites client-sent copies and internal-only paths are refused at the edge
+- **CORS** — preflight handled at the gateway, with allowed origins as configuration rather than code
 - **Declarative service-to-service calls** — OpenFeign (`@FeignClient`)
 - **JPA relationships & pagination** — `@OneToMany`, `Pageable`/`Page<T>`, auditing
 - **Transaction boundaries** — `@Transactional`, and the deliberate gap where it does *not* cover cross-service Feign calls (see [Known Limitations](#known-limitations--design-decisions))
@@ -123,6 +126,8 @@ Deliberate simplifications made to keep scope focused on core concepts — each 
 | Single Postgres instance, schema-per-service | Simple for local dev | Physically separate DB per service |
 | No circuit breaker / tracing / cache | Not core fundamentals for this scope | Resilience4j, Zipkin, Redis |
 | No public deployment | Free-tier platform limits hit during Phase 3 (see roadmap) | Paid tier or self-hosted VM |
+| No way to create an ADMIN account | Registration always assigns `USER` | Admin bootstrap endpoint or seed script |
+| Internal endpoints guarded only at the gateway | Services are unreachable directly under Compose | Signed service-to-service tokens or mTLS |
 
 Full list and reasoning: [`docs/ROADMAP.md`](docs/ROADMAP.md#known-deliberate-simplifications), [`docs/INTERVIEW-QA.md`](docs/INTERVIEW-QA.md).
 
@@ -143,3 +148,4 @@ This project runs locally only — public deployment was attempted and paused af
 | [`docs/DOCKER-NOTES.md`](docs/DOCKER-NOTES.md) / [`docs/DOCKER-STEPS.md`](docs/DOCKER-STEPS.md) | Docker concepts + step-by-step containerization runbook |
 | [`docs/TESTING-NOTES.md`](docs/TESTING-NOTES.md) | Mockito setup, test structure, gotchas found |
 | [`docs/INTERVIEW-QA.md`](docs/INTERVIEW-QA.md) | Anticipated interview Q&A about design decisions and trade-offs |
+| [`docs/FRONTEND-README.md`](docs/FRONTEND-README.md) | Handover package for building the frontend — product story, service atlas, PRD + design system (written in Indonesian) |

@@ -552,8 +552,8 @@ shopnest-frontend/
     <table>
       <thead><tr><th class="mono">Rute</th><th>Halaman</th><th>Akses</th><th>Endpoint yang dipakai</th></tr></thead>
       <tbody>
-        <tr><td class="mono">/</td><td>Katalog<small>Grid produk, filter kategori, pencarian, pagination</small></td><td><span class="pill p-neutral">Publik</span></td><td class="mono">GET /api/products</td></tr>
-        <tr><td class="mono">/p/:id</td><td>Detail produk<small>Harga, stok, tambah ke keranjang</small></td><td><span class="pill p-neutral">Publik</span></td><td class="mono">GET /api/products/{id}</td></tr>
+        <tr><td class="mono">/</td><td>Katalog<small>Grid produk, filter kategori, pencarian, pagination</small></td><td><span class="pill p-warn">Login*</span></td><td class="mono">GET /api/products</td></tr>
+        <tr><td class="mono">/p/:id</td><td>Detail produk<small>Harga, stok, tambah ke keranjang</small></td><td><span class="pill p-warn">Login*</span></td><td class="mono">GET /api/products/{id}</td></tr>
         <tr><td class="mono">/login</td><td>Masuk</td><td><span class="pill p-neutral">Publik</span></td><td class="mono">POST /api/auth/login</td></tr>
         <tr><td class="mono">/register</td><td>Daftar</td><td><span class="pill p-neutral">Publik</span></td><td class="mono">POST /api/auth/register</td></tr>
         <tr><td class="mono">/cart</td><td>Keranjang<small>Murni lokal — tidak ada request sampai checkout</small></td><td><span class="pill p-neutral">Publik</span></td><td class="mono">—</td></tr>
@@ -565,6 +565,14 @@ shopnest-frontend/
       </tbody>
     </table>
   </div>
+  <div class="call stop" style="margin-top:18px">
+    <div class="body">
+      <span class="ttl">* Katalog belum bisa dibuka tanpa login — dan ini bertentangan dengan niat produknya</span>
+      <p>Gateway mewajibkan token untuk <b>semua</b> path kecuali <code>/api/auth/</code> dan <code>/docs/specs/</code>. Artinya <code>GET /api/products</code> pun menolak pengunjung anonim, sehingga halaman <code>/</code> dan <code>/p/:id</code> praktis tidak bisa dilihat sebelum login — padahal untuk toko, katalog yang bisa dijelajahi tanpa daftar itu justru corong utamanya.</p>
+      <p>Fase dummy tidak akan menyadari ini karena MSW melayani semuanya. <b>Jangan bangun halaman katalog dengan asumsi anonim</b> sampai backend memutuskan. Uraiannya di §1.8 poin 8.</p>
+    </div>
+  </div>
+
   <div class="call ok" style="margin-top:18px">
     <div class="body">
       <span class="ttl">Rute admin sekarang dijaga backend — bukan hanya disembunyikan</span>
@@ -714,8 +722,8 @@ http.get("*/api/products", ({ request }) =&gt; {
 
 <section id="gaps">
   <h3><span class="n">1.8</span> Celah backend yang mempengaruhi frontend</h3>
-  <p class="lede">Tujuh hal yang ditemukan saat membaca kode. Tidak satu pun menghalangi fase dummy, tapi semuanya akan muncul di hari penyambungan. Diurutkan dari yang paling pasti menggigit.</p>
-  <p class="lede" style="font-size:14.5px"><b>Pembaruan:</b> poin 1 dan 2 sudah ditutup di backend (commit <code>fef6384</code>–<code>2bf3924</code> di <code>dev</code>) dan dibiarkan di sini dengan catatan hasilnya, bukan dihapus — nomor poin tidak berubah supaya rujukan lama tetap sahih. Poin 7 adalah celah baru yang muncul <i>akibat</i> perbaikan itu.</p>
+  <p class="lede">Delapan hal yang ditemukan saat membaca kode. Tidak satu pun menghalangi fase dummy, tapi semuanya akan muncul di hari penyambungan. Diurutkan dari yang paling pasti menggigit.</p>
+  <p class="lede" style="font-size:14.5px"><b>Pembaruan:</b> poin 1 dan 2 sudah ditutup di backend (commit <code>fef6384</code>–<code>2bf3924</code> di <code>dev</code>) dan dibiarkan di sini dengan catatan hasilnya, bukan dihapus — nomor poin tidak berubah supaya rujukan lama tetap sahih. Poin 7 muncul <i>akibat</i> perbaikan itu; poin 8 celah lama yang baru ketahuan saat memeriksa ulang kode.</p>
 
   <div class="call ok">
     <div class="body">
@@ -747,6 +755,7 @@ http.get("*/api/products", ({ request }) =&gt; {
     <li><b>5 · Produk tidak punya kolom gambar.</b> Tabel <code>products</code> hanya menyimpan teks dan angka. Design system menjawab ini dengan thumbnail huruf berwarna (§2.5) — pilihan desain yang sadar, bukan placeholder abu-abu.</li>
     <li><b>6 · Keranjang tidak ada di backend.</b> Sepenuhnya milik klien sampai tombol checkout ditekan. Konsekuensinya harus jujur di UI: keranjang hilang kalau ganti perangkat, dan harga di keranjang bisa basi — muat ulang harga saat halaman checkout dibuka.</li>
     <li><b>7 · Tidak ada cara membuat akun ADMIN.</b> <code>AuthServiceImpl</code> selalu mengisi <code>Role.USER</code> saat registrasi, dan tidak ada endpoint untuk menaikkan role. Sejak guard admin dipasang (lihat catatan di akhir §1.5), konsekuensinya: panel admin tidak bisa diuji lewat API sama sekali — perlu <code>UPDATE users SET role='ADMIN'</code> langsung di database, atau backend menambahkan seeding admin. Rancang panel admin seperti biasa, tapi jangan jadwalkan demonya sebelum ini beres.</li>
+    <li><b>8 · Katalog tidak bisa dibaca tanpa token.</b> <code>JwtAuthFilter.PUBLIC_PATHS</code> hanya berisi <code>/api/auth/</code> dan <code>/docs/specs/</code>, jadi <code>GET /api/products</code> membalas <code>401</code> untuk pengunjung anonim. Ini <b>bukan</b> akibat perbaikan kemarin — sudah begitu sejak Phase 1, tapi tidak pernah terlihat karena pengujian selalu memakai token. Keputusannya ada di backend: kalau katalog memang mau publik, tambahkan <code>GET /api/products</code> ke <code>PUBLIC_PATHS</code> (hanya GET, jangan seluruh prefix). Sampai itu terjadi, rute <code>/</code> dan <code>/p/:id</code> harus diperlakukan sebagai rute terlindungi.</li>
   </ul>
 </section>
 

@@ -49,12 +49,13 @@ Fase pertama berjalan dengan dummy data (MSW) dan tidak menyentuh backend sama s
 
 - [x] ~~**Tambahkan CORS di api-gateway.**~~ **Sudah ada** — `CorsWebFilter` di `api-gateway/.../config/CorsConfig.java`. Yang tersisa untukmu: origin yang diizinkan diambil dari properti `shopnest.cors.allowed-origins` dan defaultnya hanya `http://localhost:5173`. Kalau Vite-mu di port lain, daftarkan — gejalanya kalau lupa identik dengan CORS yang belum ada.
 - [x] ~~**Order dan profil orang lain bisa dibaca.**~~ **Sudah ditutup** — tujuh endpoint (bukan tiga; `PATCH /cancel` dan endpoint alamat juga terdampak) kini mencocokkan id di path dengan `X-User-Id` dan membalas `403` kalau tidak cocok.
+- [ ] **Katalog belum bisa dibuka tanpa login.** `GET /api/products` menolak pengunjung anonim karena gateway hanya membebaskan `/api/auth/` dan `/docs/specs/`. Untuk toko ini jelas bertentangan dengan niat produknya, tapi keputusannya di backend. Sampai diputuskan, perlakukan `/` dan `/p/:id` sebagai rute terlindungi — jangan bangun katalog dengan asumsi anonim.
 - [ ] **Tangani `403` terpisah dari `401`.** Ini konsekuensi dua perbaikan di atas. `401` = sesi habis, hapus token dan lempar ke `/login`. `403` = tidak berhak, **jangan logout** — tampilkan pesan dan kembalikan ke halaman sebelumnya.
 - [ ] **Jangan buat tombol "Bayar".** Enum `PAID` ada, tapi tidak ada endpoint yang menuju ke sana — satu-satunya transisi yang terpasang adalah `/cancel`.
 - [ ] **Panel admin sekarang dijaga backend, tapi belum bisa diuji.** `ProductController` sudah memeriksa `X-User-Role` (`403` untuk non-ADMIN). Masalahnya pindah: registrasi selalu menghasilkan `USER` dan tidak ada endpoint untuk menaikkan role, jadi akun ADMIN harus dibuat lewat `UPDATE` di database.
 - [ ] **Tangani 401 sebagai "sesi habis".** Tidak ada refresh token; satu access token dengan masa berlaku dari `jwt.expiration`.
 
-Uraian lengkap ketujuh celah — termasuk apa persisnya yang berubah pada dua yang sudah ditutup — ada di **§1.8** pada `FRONTEND-BRIEF.html`.
+Uraian lengkap kedelapan celah — termasuk apa persisnya yang berubah pada dua yang sudah ditutup — ada di **§1.8** pada `FRONTEND-BRIEF.html`.
 
 ---
 

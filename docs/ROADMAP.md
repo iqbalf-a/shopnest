@@ -86,6 +86,25 @@ Sistem sudah full containerized & terverifikasi end-to-end via `docker compose u
 
 ---
 
+## Phase 6 — Authorization & CORS ✅ DONE
+
+Phase 1 answered *who are you*. Reading the code again while writing the frontend handover showed nothing ever answered *what may you do* — the identity headers arrived and were then ignored on every endpoint that took an id from the path. Verified live against a running gateway (2026-09-11).
+
+- [x] Gateway: `CorsWebFilter` (`config/CorsConfig.java`) — browsers were blocked on every request, login included; Postman never showed it
+  - Origins from `shopnest.cors.allowed-origins` (default `http://localhost:5173`), overridable per environment
+  - `allowCredentials=false` — auth is a Bearer header, not a cookie
+- [x] Gateway: block internal-only paths from outside — `/api/products/*/stock/**` returns `403` before the token is even parsed; Feign bypasses the gateway so checkout is unaffected
+- [x] product-service: `ADMIN` required for catalog writes (`POST`/`PUT`/`DELETE`), read stays public
+- [x] order-service: ownership enforced on `GET /{id}` and `PATCH /{id}/cancel` — the check runs before the status transition
+- [x] user-service: ownership enforced on all five `{userId}` endpoints, addresses included
+- [x] All three: `ForbiddenException` → `403`, and `MissingRequestHeaderException` → `401` (previously surfaced as a `500`)
+- [x] Tests: non-owner cancel asserts both the exception and that the order stays `PENDING`
+- [x] Frontend handover docs refreshed — resolved gaps marked rather than deleted
+
+**Concepts:** authentication vs authorization, trust boundary, CORS preflight, perimeter vs per-service checks
+
+---
+
 ## ⏭️ Descoped entirely (was in the original architecture diagram)
 
 Not fundamental; each is a known "next step" and interview talking point:
@@ -103,5 +122,9 @@ Not fundamental; each is a known "next step" and interview talking point:
 |---|---|
 | Order cancel does not restore product stock | Saga pattern / compensating transaction |
 | `userId` trusted from request body | Fixed in Phase 1 via `X-User-Id` from JWT |
+| Path ids not matched against the caller | Fixed in Phase 6 — `403` on mismatch |
+| Catalog requires a token | `GET /api/products` is not in the gateway's `PUBLIC_PATHS`, so anonymous visitors cannot browse — likely unintended for a shop. Fix: whitelist the GET only |
+| No way to create an ADMIN account | Registration always assigns `USER`; role must be changed directly in the database. An admin bootstrap endpoint or a seed script would close it |
+| Internal endpoints protected only at the gateway | Perimeter control, not defense in depth — a service reached directly is unguarded. Proper: signed service-to-service tokens or mTLS |
 | Single shared PostgreSQL instance | Database-per-service (approximated with schema-per-service) |
 | No message broker | Kafka/RabbitMQ for async events (out of scope) |

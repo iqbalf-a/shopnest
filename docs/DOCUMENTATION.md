@@ -79,6 +79,11 @@ Ini yang bisa kamu klaim sudah dikuasai dari project ini:
 - **Spring Security** — SecurityConfig, filter chain, UserDetailsService
 - **Perimeter security** — cek token sekali di gateway, bukan di tiap service
 - **Claims propagation** — userId dari token → header `X-User-Id` → service (anti-spoofing)
+- **Autentikasi vs otorisasi** — gateway membuktikan *siapa*, tiap service memutuskan *boleh apa*
+- **Role guard** — `X-User-Role` dicek di product-service untuk operasi tulis katalog
+- **Ownership check** — id di path wajib cocok dengan `X-User-Id` (order, profil, alamat)
+- **Internal endpoint** — path yang hanya boleh dipanggil antar-service ditolak gateway dari luar
+- **CORS** — `CorsWebFilter` di gateway; preflight dijawab sebelum pemeriksaan token
 
 ### Spring Cloud / Microservices
 - **Service discovery** — Eureka (register + lookup by name)
@@ -115,6 +120,8 @@ POST /api/orders  (header: Authorization: Bearer <token>, body: items[])
       4. valid → set header X-User-Id / X-User-Email / X-User-Role dari claim
       5. teruskan ke order-service (lb:// → Eureka)
   → OrderController.createOrder(@RequestHeader X-User-Id, body)
+     (endpoint ini tidak perlu cek pemilik: identitasnya MEMANG dari header,
+      tidak ada id dari client yang bisa dipalsukan)
   → OrderServiceImpl.createOrder():
       FASE 1: tiap item → ProductClient.getProduct() [Feign → product-service]  (cek produk ada)
       FASE 2: tiap item → ProductClient.reduceStock() [Feign → product-service] (potong stok, 409 kalau kurang)
@@ -125,6 +132,36 @@ POST /api/orders  (header: Authorization: Bearer <token>, body: items[])
 
 ### Kenapa "snapshot" harga di OrderItem?
 Harga produk bisa berubah nanti. Struk/order harus mencatat harga **saat transaksi**, bukan harga terkini. Maka OrderItem menyalin `productName` & `price` saat order dibuat.
+
+### C. Request ke milik orang lain (jalur 403)
+```
+GET /api/orders/{id}  (token milik user B, id milik user A)
+  → Gateway JwtAuthFilter: token valid → set X-User-Id = B
+  → OrderController.getOrder(@RequestHeader X-User-Id = B, @PathVariable id)
+  → OrderServiceImpl.getOrderById(id, requesterId=B)
+      findOrderOrThrow(id)        → ketemu, order.userId = A
+      requireOwner(order, B)      → A != B → ForbiddenException
+  → GlobalExceptionHandler → 403
+```
+Dua nilai yang dibandingkan punya asal berbeda: `id` dari client (bisa apa saja),
+`X-User-Id` dari token terverifikasi (tidak bisa dipalsukan). Perbandingan itulah otorisasinya.
+
+### Model otorisasi — siapa memutuskan apa
+
+| Lapisan | Memutuskan | Contoh |
+|---|---|---|
+| Gateway | Token asli? Path ini boleh muncul dari luar? | `401` tanpa token · `403` untuk `/stock/**` |
+| Controller | Role cukup? Yang diminta miliknya sendiri? | `requireAdmin()` · `requireSelf()` |
+| Service | Pemilik resource yang tersimpan? | `requireOwner()` — butuh baca entity dulu |
+
+Kenapa cek pemilik ada di service, bukan controller: keputusannya butuh entity-nya lebih dulu,
+dan pada `cancelOrder` harus terjadi **sebelum** status diubah.
+
+Kenapa otorisasi tidak di gateway: aturan seperti "hanya ADMIN yang boleh POST /api/products"
+sebenarnya bisa, tapi "boleh tidak user ini membatalkan order X" butuh membaca database
+order-service — gateway tidak punya (dan tidak boleh punya) akses itu. Menaruh aturan role di
+gateway juga memisahkan aturan dari kode yang dilindunginya, sehingga endpoint baru gampang
+lolos tanpa penjagaan.
 
 ---
 
@@ -155,26 +192,38 @@ Urutan start (penting: Eureka dulu):
 
 Semua diakses lewat gateway `http://localhost:8080`. Selain `/api/auth/**` butuh header `Authorization: Bearer <token>`.
 
-| Method | Path | Fungsi |
-|--------|------|--------|
-| POST | /api/auth/register | daftar akun, dapat token |
-| POST | /api/auth/login | login, dapat token |
-| POST | /api/users | buat profil (userId dari token) |
-| GET | /api/users/{userId} | lihat profil |
-| PUT | /api/users/{userId} | update profil |
-| POST | /api/users/{userId}/addresses | tambah alamat |
-| GET | /api/users/{userId}/addresses | list alamat |
-| DELETE | /api/users/{userId}/addresses/{id} | hapus alamat |
-| POST | /api/products | tambah produk |
-| GET | /api/products?page=&size=&sort=&category=&search= | list (paginated) |
-| GET | /api/products/{id} | detail produk |
-| PUT | /api/products/{id} | update produk |
-| DELETE | /api/products/{id} | hapus produk |
-| POST | /api/products/{id}/stock/reduce?quantity= | kurangi stok (dipanggil order via Feign) |
-| POST | /api/orders | checkout (userId dari token) |
-| GET | /api/orders | riwayat order saya |
-| GET | /api/orders/{id} | detail order |
-| PATCH | /api/orders/{id}/cancel | batalkan order (hanya status PENDING) |
+Kolom **Akses** menunjukkan siapa yang boleh, di luar syarat punya token yang sah:
+**publik** · **login** (token saja cukup) · **pemilik** (id di path harus = `X-User-Id`, kalau tidak `403`) ·
+**ADMIN** (`X-User-Role`, kalau tidak `403`) · **internal** (ditolak gateway dari luar, hanya Feign)
+
+| Method | Path | Fungsi | Akses |
+|--------|------|--------|-------|
+| POST | /api/auth/register | daftar akun, dapat token (selalu role USER) | publik |
+| POST | /api/auth/login | login, dapat token | publik |
+| POST | /api/users | buat profil (userId dari token) | login |
+| GET | /api/users/{userId} | lihat profil | pemilik |
+| PUT | /api/users/{userId} | update profil | pemilik |
+| POST | /api/users/{userId}/addresses | tambah alamat | pemilik |
+| GET | /api/users/{userId}/addresses | list alamat | pemilik |
+| DELETE | /api/users/{userId}/addresses/{id} | hapus alamat | pemilik |
+| POST | /api/products | tambah produk | **ADMIN** |
+| GET | /api/products?page=&size=&sort=&category=&search= | list (paginated) | login |
+| GET | /api/products/{id} | detail produk | login |
+| PUT | /api/products/{id} | update produk | **ADMIN** |
+| DELETE | /api/products/{id} | hapus produk | **ADMIN** |
+| POST | /api/products/{id}/stock/reduce?quantity= | kurangi stok (dipanggil order via Feign) | **internal** |
+| POST | /api/orders | checkout (userId dari token) | login |
+| GET | /api/orders | riwayat order saya | login |
+| GET | /api/orders/{id} | detail order | pemilik |
+| PATCH | /api/orders/{id}/cancel | batalkan order (hanya status PENDING) | pemilik |
+
+**Catatan:** `GET /api/products` bertanda **login**, bukan publik — `PUBLIC_PATHS` di gateway hanya berisi
+`/api/auth/` dan `/docs/specs/`, jadi pengunjung anonim tidak bisa melihat katalog. Untuk toko ini
+kemungkinan tidak disengaja; kalau katalog memang mau publik, tambahkan **hanya** `GET /api/products`
+ke `PUBLIC_PATHS` — jangan seluruh prefix `/api/products`, karena itu ikut membuka operasi tulis.
+
+**Catatan:** tidak ada endpoint untuk membuat akun ADMIN — registrasi selalu menghasilkan `USER`.
+Untuk mencoba endpoint ber-role ADMIN, ubah `role` langsung di tabel `users`.
 
 ---
 
@@ -189,6 +238,9 @@ Ini penting untuk wawancara — menunjukkan kamu paham trade-off, bukan sekadar 
 | Satu DB instance, schema per service | Sederhana untuk dev | Database fisik terpisah per service |
 | Tidak ada message broker | Di luar scope belajar dasar | Kafka/RabbitMQ untuk event async |
 | Descoped: Circuit breaker, tracing, cache | Bukan materi dasar | Resilience4j, Zipkin, Redis |
+| Tidak ada cara membuat akun ADMIN | Belum ada kebutuhan multi-admin | Endpoint bootstrap admin atau seed script |
+| Endpoint internal hanya dijaga gateway | Di Compose port service tidak di-publish | Token service-to-service bertanda tangan atau mTLS |
+| Tidak ada refresh token | Satu access token cukup untuk scope ini | Refresh token + rotasi, blacklist untuk logout instan |
 
 ---
 

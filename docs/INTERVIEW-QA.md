@@ -45,6 +45,7 @@ Auth-service **membuat** token saat login (sign dengan secret, isi: email, role,
 
 **Q: Kenapa verifikasi JWT di gateway, bukan di tiap service?**
 Prinsip perimeter security: cek sekali di pintu masuk. Keuntungan: kode verifikasi tidak diduplikasi ke semua service, `jwt.secret` tidak disebar, service belakang tetap sederhana, dan request tanpa token ditolak sebelum menyentuh service.
+Kelemahannya harus disebut juga: ini menukar keamanan berlapis dengan kesederhanaan, dan bergantung pada satu asumsi — jaringan internal tidak bisa dijangkau sembarang orang. Kalau seseorang bisa memanggil product-service:8083 langsung, ia bisa mengarang header `X-User-Id` sendiri. Di Docker Compose asumsi itu dijaga: hanya port gateway yang di-publish.
 
 **Q: Apa isi sebuah JWT?**
 3 bagian dipisah titik: **Header** (algoritma), **Payload** (claims: subject, role, userId, exp), **Signature** (tanda tangan). Signature memastikan isi tidak diubah — kalau payload diutak-atik, signature tidak cocok saat diverifikasi.
@@ -54,6 +55,29 @@ TIDAK. JWT hanya **di-encode (Base64) dan ditandatangani**, bukan dienkripsi. Si
 
 **Q: Bagaimana mencegah user memalsukan identitasnya?**
 Service belakang percaya header `X-User-Id`. Header itu HANYA diisi gateway dari token terverifikasi. Kalau client mengirim `X-User-Id` sendiri: pada endpoint terlindungi gateway menimpanya (`headers.set`), pada endpoint publik gateway membuangnya (`headers.remove`/stripUserHeaders). Jadi client tidak bisa mengaku jadi orang lain.
+
+**Q: Apa bedanya autentikasi dan otorisasi? Di project ini masing-masing di mana?**
+Autentikasi = "kamu siapa, buktikan". Otorisasi = "kamu boleh apa". Di ShopNest keduanya sengaja dipisah tempat: **gateway** melakukan autentikasi (verifikasi signature + expiry, lalu meneruskan identitas sebagai header), **tiap service** melakukan otorisasi (`requireAdmin` di product-service, `requireSelf` di user-service, `requireOwner` di order-service). Kalimat singkatnya: gateway membuktikan *siapa*, service memutuskan *boleh apa*.
+
+**Q: Kenapa otorisasi tidak sekalian ditaruh di gateway saja?**
+Aturan kasar berbasis role sebenarnya bisa — "hanya ADMIN yang boleh `POST /api/products`" cukup path + method + role, dan banyak gateway komersial memang begitu. Tapi aturan kepemilikan tidak bisa: untuk menjawab "boleh tidak user ini membatalkan order X", saya harus membaca order X dari database order-service. Gateway tidak punya akses itu dan tidak boleh punya. Alasan kedua lebih praktis: kalau aturan role ditaruh di gateway, aturannya jauh dari kode yang dilindunginya — tambah endpoint baru, lupa tambah aturan, endpoint itu diam-diam terbuka.
+
+**Q: Token sudah berisi userId dan role. Kenapa masih perlu header `X-User-Id`? Kenapa service tidak baca token sendiri?**
+Bisa saja, dan itu desain yang sah. Token memang ikut diteruskan ke service. Tapi di project ini user/product/order-service tidak punya library `jjwt` maupun `jwt.secret` — mereka **tidak bisa** membongkar token itu. `X-User-Id` bukan informasi tambahan, melainkan *hasil verifikasi yang sudah jadi*, dititipkan supaya service tidak perlu mengulang pekerjaan gateway.
+Analoginya: token = paspor, gateway = resepsionis yang memeriksanya dan memberi badge tamu, `X-User-Id` = badge itu. Badge hanya sah selama satu-satunya pintu masuk adalah resepsionis.
+
+**Q: Kalau begitu, alternatifnya apa, dan kenapa tidak dipakai?**
+Alternatifnya tiap service memverifikasi token sendiri. Untungnya berlapis — service tetap aman walau dijangkau langsung. Ruginya `jwt.secret` tersebar ke tiga service lagi, jadi rotasi secret harus serentak di lima file. Kodenya sendiri tidak perlu ditulis tiga kali — cukup satu modul bersama.
+Jalan tengah yang lazim di produksi: kunci **asimetris** (RS256). Private key hanya di auth-service, service lain cukup pegang public key. Dapat verifikasi berlapis tanpa menyebar rahasia.
+
+**Q: Apa beda 401 dan 403, dan kapan project ini memakainya?**
+`401 Unauthorized` = identitasnya bermasalah — token tidak ada, salah, atau kedaluwarsa. Client harus login ulang. `403 Forbidden` = identitasnya sah, tapi haknya kurang — login ulang tidak akan menolong. Di ShopNest: gateway mengirim 401 untuk token bermasalah; service mengirim 403 saat role kurang atau resource milik orang lain. Ini penting untuk frontend: 401 memicu logout, 403 tidak boleh.
+
+**Q: Kenapa perlu konfigurasi CORS padahal di Postman semuanya lancar?**
+Karena CORS adalah aturan **browser**, bukan aturan server. Postman dan curl mengabaikannya sepenuhnya, jadi masalahnya tidak pernah terlihat selama pengujian pakai Postman. Di browser, request dengan `Content-Type: application/json` atau header `Authorization` memicu preflight `OPTIONS` lebih dulu — dan preflight itu datang **tanpa** header `Authorization`, sehingga dibalas 401 oleh filter JWT. Akibatnya semua request gagal, login sekalipun. Perbaikannya satu `CorsWebFilter` di gateway; karena ia berjalan di lapisan WebFlux, preflight dijawab sebelum filter JWT sempat memeriksa token.
+
+**Q: Ada endpoint `POST /api/products/{id}/stock/reduce`. Kenapa tidak dijaga role saja seperti endpoint tulis lainnya?**
+Karena akan merusak checkout. Order-service memanggilnya lewat Feign ke `lb://product-service` — langsung ke service lewat Eureka, tidak melewati gateway, jadi tidak ada `X-User-Role` di sana. Dan pemanggilnya memang user biasa yang sedang belanja, bukan admin. Masalah keduanya: endpoint ini tidak punya konsep pemilik, jadi tidak ada aturan per-request yang bisa membedakan panggilan sah dari panggilan jahat — keduanya cuma `id` + `quantity`. Pembedanya bukan *siapa* tapi *dari mana*, dan satu-satunya yang tahu itu adalah gateway. Maka pemblokirannya di gateway, sebelum token bahkan diperiksa.
 
 **Q: Bagaimana kalau token dicuri?**
 Risiko nyata JWT — siapa pun yang punya token bisa memakainya sampai expiry. Mitigasi: expiry pendek, HTTPS (cegah penyadapan), dan refresh token. Untuk logout instan diperlukan token blacklist/revocation (belum diimplementasi di project ini — jujur sebutkan sebagai batasan).
@@ -140,6 +164,14 @@ Beberapa:
 3. **Bearer case-sensitive** — filter awalnya menolak `bearer` huruf kecil, padahal RFC 7235 bilang case-insensitive. Fix: `toLowerCase()`.
 4. **Supabase pooler + prepared statement** — error "bad SQL grammar" karena pgbouncer transaction mode. Fix: `prepareThreshold=0` di JDBC URL.
 5. **Docs Scalar CORS** — spec menunjuk port service sendiri, bukan gateway. Fix: `server.forward-headers-strategy=framework`.
+6. **Preflight CORS kena 401** — browser mengirim `OPTIONS` tanpa header `Authorization`, dan filter JWT menolak apa pun tanpa Bearer. Gejalanya: semua request dari browser gagal, login sekalipun, padahal Postman mulus. Fix: `CorsWebFilter` di gateway — karena WebFilter berjalan sebelum GlobalFilter, preflight dijawab sebelum token diperiksa.
+7. **Header identitas hilang jadi 500** — `@RequestHeader("X-User-Id")` yang wajib melempar `MissingRequestHeaderException`, dan itu tertangkap `handleGeneral(Exception.class)` sehingga terbaca sebagai error server. Padahal artinya request tidak lewat gateway. Fix: handler khusus → `401`. Pelajarannya: `@ExceptionHandler(Exception.class)` yang terlalu rakus bisa menyamarkan penyebab sebenarnya.
+
+**Q: Pernah menemukan celah keamanan di kodemu sendiri? Bagaimana menanganinya?**
+Ya. Saat menulis dokumen serah-terima untuk frontend, saya baca ulang semua controller dan sadar identitas dari gateway diterima tapi **tidak pernah dipakai** di endpoint yang menerima id dari path — siapa pun dengan token sah bisa membaca pesanan orang lain, membatalkannya, membaca alamat orang lain, bahkan menghapus produk karena `ProductController` sama sekali tidak punya pengecekan role.
+Yang saya lakukan: urutkan berdasarkan dampak nyata, bukan abjad. Yang paling parah ternyata product-service — bukan karena paling sensitif, tapi karena satu-satunya yang **tidak butuh menebak UUID**: id produk dibagikan gratis oleh katalog publik. Baru setelah itu kepemilikan order dan profil. Saya juga menemukan cakupannya lebih luas dari dugaan awal: tujuh endpoint, tiga di antaranya operasi tulis.
+Pelajaran yang saya ambil: Postman membuat semuanya terlihat baik-baik saja karena saya selalu menguji sebagai pemilik data. Celah jenis ini hanya muncul kalau sengaja bertanya "bagaimana kalau id ini milik orang lain?".
+Pemeriksaan yang sama juga memunculkan hal sebaliknya — endpoint yang terlalu **tertutup**: `GET /api/products` butuh token karena gateway hanya membebaskan `/api/auth/`, sehingga pengunjung anonim tidak bisa melihat katalog sama sekali. Untuk toko itu kemungkinan tidak disengaja. Menarik karena arah kesalahannya berlawanan, tapi akarnya sama: aturan akses tidak pernah dibandingkan dengan niat produknya.
 
 **Q: Kenapa service gagal start dengan "Tenant or user not found"?**
 Supabase free tier auto-pause setelah idle ~seminggu. Harus resume manual di dashboard. Ini alasan kuat pindah ke Docker PostgreSQL.
@@ -157,7 +189,8 @@ Jawaban ideal: **Saga pattern** — rangkaian transaksi lokal, tiap langkah puny
 Operasi idempoten = dipanggil berkali-kali hasilnya sama (GET, PUT). Non-idempoten = POST (buat order 2x = 2 order). Penting untuk retry aman: kalau network timeout dan client retry, operasi idempoten tidak menduplikasi. Solusi untuk POST: idempotency key.
 
 **Q: Bagaimana kamu mengamankan komunikasi antar service (internal)?**
-Di project ini internal dianggap trusted (tidak diamankan). Di production: mTLS (mutual TLS), service mesh (Istio), atau token service-to-service. Sebut ini sebagai next step.
+Jalur internalnya sendiri masih dianggap trusted — panggilan Feign tidak membawa kredensial apa pun. Yang sudah ada baru penjagaan di perimeter: endpoint internal seperti `/api/products/*/stock/**` ditolak gateway kalau dipanggil dari luar, dan di Docker Compose port service tidak di-publish sehingga gateway benar-benar satu-satunya pintu.
+Saya sadar ini **kontrol perimeter, bukan defense in depth** — kalau seseorang bisa menjangkau service secara langsung, tidak ada yang menghalangi. Langkah berikutnya yang benar: mTLS, service mesh (Istio), atau token service-to-service bertanda tangan yang disuntikkan lewat Feign `RequestInterceptor`. Saya menilai itu belum sebanding untuk skala project ini, tapi itu keputusan sadar, bukan kelalaian.
 
 **Q: Apa itu N+1 query problem?**
 Saat memuat 1 entity lalu relasinya di-query satu per satu dalam loop → 1 + N query. Solusi: fetch join, `@EntityGraph`, atau batch fetch. Relevan dengan lazy loading.
