@@ -58,5 +58,10 @@ spring.cloud.gateway.routes[7].uri=lb://order-service
 spring.cloud.gateway.routes[7].predicates[0]=Path=/docs/specs/orders
 spring.cloud.gateway.routes[7].filters[0]=SetPath=/v3/api-docs
 
+# ===== CORS =====
+# Origin frontend yang boleh memanggil gateway dari browser (Vite default: 5173).
+# Pisahkan dengan koma kalau lebih dari satu.
+shopnest.cors.allowed-origins=http://localhost:5173
+
 # Actuator
 management.endpoints.web.exposure.include=health,info
