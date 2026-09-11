@@ -184,6 +184,7 @@
   .call.stop{background:var(--bad-soft)}
   .call.warn{background:var(--warn-soft)}
   .call.pick{background:var(--brand-50)}
+  .call.ok{background:var(--ok-soft)}
   .call div.body{min-width:0}
   .call p{margin:0 0 9px}
   .call p:last-child{margin:0}
@@ -194,6 +195,7 @@
   .call.stop .ttl{color:var(--bad)}
   .call.warn .ttl{color:var(--warn)}
   .call.pick .ttl{color:var(--brand-700)}
+  .call.ok .ttl{color:var(--ok)}
 
   /* lists */
   ul.plain,ul.check{list-style:none;margin:0 0 18px;padding:0}
@@ -563,10 +565,11 @@ shopnest-frontend/
       </tbody>
     </table>
   </div>
-  <div class="call warn" style="margin-top:18px">
+  <div class="call ok" style="margin-top:18px">
     <div class="body">
-      <span class="ttl">Rute admin hanya disembunyikan, belum diamankan</span>
-      <p>Tidak ada <code>@PreAuthorize</code> di <code>ProductController</code>. Menyembunyikan menu berdasarkan <code>role</code> dari token adalah keputusan UX, <b>bukan keamanan</b> — siapa pun yang punya token valid masih bisa memanggil <code>POST /api/products</code> langsung. Jangan tulis di README bahwa panel admin "terlindungi" sampai backend menambahkan guard-nya.</p>
+      <span class="ttl">Rute admin sekarang dijaga backend — bukan hanya disembunyikan</span>
+      <p><code>ProductController</code> memeriksa <code>X-User-Role</code> pada <code>POST</code>, <code>PUT</code>, dan <code>DELETE</code>; selain <code>ADMIN</code> dibalas <b>403</b>. Menyembunyikan menu berdasarkan <code>role</code> dari token tetap keputusan UX, tapi kini ada guard di belakangnya — memanggil <code>POST /api/products</code> langsung dengan token USER tidak lagi berhasil.</p>
+      <p>Konsekuensi praktis saat menguji: <b>belum ada cara membuat akun ADMIN lewat API</b>. Pendaftaran selalu menghasilkan <code>USER</code>, jadi panel admin hanya bisa dicoba dengan akun yang role-nya diubah langsung di database. Lihat §1.8 poin 7.</p>
     </div>
   </div>
 </section>
@@ -635,9 +638,10 @@ shopnest-frontend/
       <tbody>
         <tr><td class="mono">400</td><td>Validasi gagal (<code>@Valid</code>)</td><td class="mono">Record&lt;field, pesan&gt;</td><td>Tempel tiap pesan di bawah field-nya, bukan di toast</td></tr>
         <tr><td class="mono">401</td><td>Email/password salah, atau token kadaluwarsa/hilang</td><td class="mono">null</td><td>Di form login: pesan inline. Di tempat lain: hapus sesi, lempar ke <code>/login</code></td></tr>
+        <tr><td class="mono">403</td><td>Menyentuh milik orang lain (order/profil/alamat), atau menulis katalog tanpa role ADMIN</td><td class="mono">null</td><td>Bukan "sesi habis" — jangan logout. Tampilkan pesan tidak berhak lalu kembalikan ke halaman sebelumnya</td></tr>
         <tr><td class="mono">404</td><td>Produk / order / profil tidak ditemukan</td><td class="mono">null</td><td>Halaman kosong dengan jalan keluar, bukan toast</td></tr>
         <tr><td class="mono">409</td><td>Email sudah terdaftar; profil sudah ada</td><td class="mono">null</td><td>Inline di field email</td></tr>
-        <tr><td class="mono">400</td><td>Stok kurang; order tidak bisa dibatalkan</td><td class="mono">null</td><td>Toast merah + refresh data produk/order</td></tr>
+        <tr><td class="mono">409</td><td>Stok kurang; order tidak bisa dibatalkan</td><td class="mono">null</td><td>Toast merah + refresh data produk/order</td></tr>
         <tr><td class="mono">500</td><td>Apa pun yang lain</td><td class="mono">null</td><td>Pesan umum + tombol coba lagi; jangan tampilkan <code>message</code> mentah</td></tr>
       </tbody>
     </table>
@@ -702,7 +706,7 @@ http.get("*/api/products", ({ request }) =&gt; {
   <ul class="check">
     <li>Ganti <code>VITE_API_BASE_URL</code> dari kosong (MSW) ke <code>http://localhost:8080</code>.</li>
     <li>Hentikan pendaftaran worker MSW di <code>main.tsx</code> — satu blok <code>if (import.meta.env.DEV &amp;&amp; USE_MOCKS)</code>.</li>
-    <li>Tambahkan CORS di gateway lebih dulu (§1.8) — tanpa ini, semua request gagal di browser.</li>
+    <li>Pastikan origin dev-mu terdaftar di <code>shopnest.cors.allowed-origins</code> pada gateway (§1.8 poin 1). CORS-nya sudah ada, tapi hanya <code>http://localhost:5173</code> yang diizinkan secara default.</li>
     <li>Jalankan ulang seluruh alur dan bandingkan: bentuk response harus identik dengan dummy. Selisih apa pun berarti §1.6 yang salah, bukan komponennya.</li>
   </ul>
   <p style="color:var(--muted);font-size:14.5px">Handler MSW tidak dibuang setelah itu — pindahkan ke test. Mereka jadi fondasi pengujian komponen tanpa menyalakan tujuh service.</p>
@@ -710,19 +714,24 @@ http.get("*/api/products", ({ request }) =&gt; {
 
 <section id="gaps">
   <h3><span class="n">1.8</span> Celah backend yang mempengaruhi frontend</h3>
-  <p class="lede">Enam hal yang ditemukan saat membaca kode. Tidak satu pun menghalangi fase dummy, tapi semuanya akan muncul di hari penyambungan. Diurutkan dari yang paling pasti menggigit.</p>
+  <p class="lede">Tujuh hal yang ditemukan saat membaca kode. Tidak satu pun menghalangi fase dummy, tapi semuanya akan muncul di hari penyambungan. Diurutkan dari yang paling pasti menggigit.</p>
+  <p class="lede" style="font-size:14.5px"><b>Pembaruan:</b> poin 1 dan 2 sudah ditutup di backend (commit <code>fef6384</code>–<code>2bf3924</code> di <code>dev</code>) dan dibiarkan di sini dengan catatan hasilnya, bukan dihapus — nomor poin tidak berubah supaya rujukan lama tetap sahih. Poin 7 adalah celah baru yang muncul <i>akibat</i> perbaikan itu.</p>
 
-  <div class="call stop">
+  <div class="call ok">
     <div class="body">
-      <span class="ttl">1 · Tidak ada konfigurasi CORS di mana pun — pemblokir mutlak</span>
-      <p>Pencarian <code>cors</code> di seluruh Java dan properties tidak menghasilkan apa pun. Postman tidak peduli CORS, jadi ini tidak pernah ketahuan. Browser peduli: <b>setiap</b> request dari <code>localhost:5173</code> ke <code>localhost:8080</code> akan ditolak sebelum sampai ke gateway. Perbaikannya kecil — satu <code>CorsWebFilter</code> di api-gateway yang mengizinkan origin dev — tapi harus ada sebelum baris frontend pertama menyentuh API asli.</p>
+      <span class="ttl">1 · CORS — <b>sudah diperbaiki</b></span>
+      <p>Dulu: pencarian <code>cors</code> di seluruh Java dan properties tidak menghasilkan apa pun, sehingga <b>setiap</b> request dari <code>localhost:5173</code> ditolak browser — termasuk login, karena <code>Content-Type: application/json</code> memicu preflight <code>OPTIONS</code> yang datang tanpa header <code>Authorization</code> dan dibalas 401 oleh filter JWT.</p>
+      <p>Sekarang: <code>CorsWebFilter</code> ada di <code>api-gateway/.../config/CorsConfig.java</code>. Preflight dari origin terdaftar dibalas <b>200</b> beserta <code>Access-Control-Allow-Origin/Methods/Headers</code> dan <code>Max-Age: 3600</code>; origin tak terdaftar tetap ditolak. Karena <code>CorsWebFilter</code> berjalan di lapisan WebFlux, ia menjawab preflight sebelum <code>JwtAuthFilter</code> sempat memeriksa token.</p>
+      <p><b>Yang masih perlu kamu lakukan:</b> origin dev diambil dari properti <code>shopnest.cors.allowed-origins</code>, default <code>http://localhost:5173</code>. Kalau Vite kamu jalan di port lain, atau frontend sudah dideploy, daftarkan origin itu — kalau tidak, gejalanya identik dengan CORS yang belum ada sama sekali.</p>
     </div>
   </div>
 
-  <div class="call warn">
+  <div class="call ok">
     <div class="body">
-      <span class="ttl">2 · Order dan profil orang lain bisa dibaca</span>
-      <p><code>GET /api/orders/{id}</code> hanya menerima id dari path — tidak dicocokkan dengan <code>X-User-Id</code>. Hal yang sama pada <code>GET</code>/<code>PUT /api/users/{userId}</code>. Frontend tidak bisa menambal ini; jangan bangun fitur apa pun yang bergantung pada asumsi order bersifat privat.</p>
+      <span class="ttl">2 · Order, profil, dan alamat orang lain — <b>sudah diperbaiki</b></span>
+      <p>Dulu: id di path tidak pernah dicocokkan dengan <code>X-User-Id</code>. Cakupannya ternyata lebih luas dari yang tertulis di versi pertama dokumen ini — bukan tiga endpoint, tapi tujuh, dan tiga di antaranya operasi tulis: <code>PATCH /api/orders/{id}/cancel</code> (membatalkan pesanan orang lain), <code>POST</code> dan <code>DELETE /api/users/{userId}/addresses/…</code>.</p>
+      <p>Sekarang: semuanya membandingkan id di path dengan <code>X-User-Id</code> dari gateway dan membalas <b>403</b> kalau tidak cocok. Pada <code>cancel</code>, pengecekan terjadi sebelum status diubah — pesanan korban tetap <code>PENDING</code>.</p>
+      <p><b>Yang berubah untuk frontend:</b> asumsi "order bersifat privat" sekarang boleh dipakai. Tambahkan penanganan <b>403</b> (lihat tabel status di §1.6) — dan perlakukan berbeda dari 401: 403 bukan sesi habis, jangan logout.</p>
     </div>
   </div>
 
@@ -737,6 +746,7 @@ http.get("*/api/products", ({ request }) =&gt; {
     <li><b>4 · Tidak ada refresh token.</b> Satu access token dengan masa berlaku dari <code>jwt.expiration</code>. Saat kadaluwarsa, satu-satunya jalan adalah login ulang — rancang penanganan 401 sebagai "sesi habis, masuk lagi", bukan percobaan diam-diam.</li>
     <li><b>5 · Produk tidak punya kolom gambar.</b> Tabel <code>products</code> hanya menyimpan teks dan angka. Design system menjawab ini dengan thumbnail huruf berwarna (§2.5) — pilihan desain yang sadar, bukan placeholder abu-abu.</li>
     <li><b>6 · Keranjang tidak ada di backend.</b> Sepenuhnya milik klien sampai tombol checkout ditekan. Konsekuensinya harus jujur di UI: keranjang hilang kalau ganti perangkat, dan harga di keranjang bisa basi — muat ulang harga saat halaman checkout dibuka.</li>
+    <li><b>7 · Tidak ada cara membuat akun ADMIN.</b> <code>AuthServiceImpl</code> selalu mengisi <code>Role.USER</code> saat registrasi, dan tidak ada endpoint untuk menaikkan role. Sejak guard admin dipasang (lihat catatan di akhir §1.5), konsekuensinya: panel admin tidak bisa diuji lewat API sama sekali — perlu <code>UPDATE users SET role='ADMIN'</code> langsung di database, atau backend menambahkan seeding admin. Rancang panel admin seperti biasa, tapi jangan jadwalkan demonya sebelum ini beres.</li>
   </ul>
 </section>
 
@@ -763,7 +773,7 @@ http.get("*/api/products", ({ request }) =&gt; {
         <li><b>M3 · Sesi</b> — login/daftar, simpan token, rute terlindungi</li>
         <li><b>M4 · Belanja</b> — keranjang, checkout, riwayat, pembatalan</li>
         <li><b>M5 · Profil &amp; admin</b> — alamat, CRUD produk</li>
-        <li><b>M6 · Sambungkan</b> — CORS di gateway, matikan MSW, uji ulang penuh</li>
+        <li><b>M6 · Sambungkan</b> — cek origin di CORS gateway, matikan MSW, uji ulang penuh termasuk jalur 403</li>
       </ul>
     </div>
   </div>

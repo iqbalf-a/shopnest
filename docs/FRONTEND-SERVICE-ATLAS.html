@@ -300,6 +300,7 @@
   }
   .tag.pub{background:var(--accent-soft);color:var(--accent-ink)}
   .tag.feign{background:var(--flag-soft);color:var(--flag)}
+  .tag.admin{background:var(--accent-soft);color:var(--accent-ink)}
   .svc-foot{
     margin-top:auto;
     padding:11px 16px;
@@ -379,7 +380,7 @@
       <span class="sec-num">I</span>
       <h2>Peta service</h2>
     </div>
-    <p class="sec-note">Gateway adalah satu-satunya pintu dari luar. Ia memverifikasi JWT, lalu meneruskan identitas sebagai header <code>X-User-Id</code> / <code>X-User-Email</code> / <code>X-User-Role</code> — service percaya pada gateway, bukan pada client. Panggilan antar service (order → product saat checkout) lewat OpenFeign dan tidak menyentuh gateway sama sekali.</p>
+    <p class="sec-note">Gateway adalah satu-satunya pintu dari luar. Ia memverifikasi JWT, lalu meneruskan identitas sebagai header <code>X-User-Id</code> / <code>X-User-Email</code> / <code>X-User-Role</code> — service percaya pada gateway, bukan pada client. Panggilan antar service (order → product saat checkout) lewat OpenFeign dan tidak menyentuh gateway sama sekali — justru karena itu <code>/api/products/{id}/stock/reduce</code> ditolak gateway (403) untuk panggilan dari luar: Feign tetap bisa, browser tidak. Gateway juga menjawab preflight CORS sebelum pemeriksaan token, dan tiap service memeriksa sendiri apakah id di path cocok dengan <code>X-User-Id</code> — gateway membuktikan <i>siapa</i>, service memutuskan <i>boleh apa</i>.</p>
     <p class="scroll-hint">← geser untuk melihat penuh →</p>
     <div class="scroller">
       <svg id="topology" viewBox="0 0 1000 522" role="img" aria-label="Diagram topologi service ShopNest: client ke api-gateway, lalu ke auth, user, product, dan order service, semuanya di atas satu PostgreSQL dengan schema terpisah.">
@@ -542,11 +543,11 @@
         <p class="svc-schema">SCHEMA <b>user_service</b> · TABEL <b>user_profiles</b>, <b>addresses</b></p>
         <ul class="routes">
           <li><span class="verb">POST</span><span class="path">/api/users<small>Buat profil untuk user yang login</small></span><span class="tag">X-USER-ID</span></li>
-          <li><span class="verb">GET</span><span class="path">/api/users/{userId}</span></li>
-          <li><span class="verb">PUT</span><span class="path">/api/users/{userId}<small>Nama, telepon, tanggal lahir</small></span></li>
-          <li><span class="verb">POST</span><span class="path">/api/users/{userId}/addresses</span></li>
-          <li><span class="verb">GET</span><span class="path">/api/users/{userId}/addresses</span></li>
-          <li><span class="verb del">DELETE</span><span class="path">/api/users/{userId}/addresses/{addressId}</span></li>
+          <li><span class="verb">GET</span><span class="path">/api/users/{userId}<small>userId harus sama dengan X-User-Id, kalau tidak 403</small></span><span class="tag">X-USER-ID</span></li>
+          <li><span class="verb">PUT</span><span class="path">/api/users/{userId}<small>Nama, telepon, tanggal lahir — hanya milik sendiri</small></span><span class="tag">X-USER-ID</span></li>
+          <li><span class="verb">POST</span><span class="path">/api/users/{userId}/addresses</span><span class="tag">X-USER-ID</span></li>
+          <li><span class="verb">GET</span><span class="path">/api/users/{userId}/addresses</span><span class="tag">X-USER-ID</span></li>
+          <li><span class="verb del">DELETE</span><span class="path">/api/users/{userId}/addresses/{addressId}</span><span class="tag">X-USER-ID</span></li>
         </ul>
         <p class="svc-foot">Satu profil per <b>user_id</b> (unique) · alamat boleh banyak, satu ditandai default</p>
       </article>
@@ -556,12 +557,12 @@
         <p class="svc-role">Katalog dan pemilik stok. Satu-satunya yang boleh mengubah angka stok.</p>
         <p class="svc-schema">SCHEMA <b>product_service</b> · TABEL <b>products</b></p>
         <ul class="routes">
-          <li><span class="verb">POST</span><span class="path">/api/products</span></li>
+          <li><span class="verb">POST</span><span class="path">/api/products</span><span class="tag admin">ADMIN</span></li>
           <li><span class="verb">GET</span><span class="path">/api/products<small>?category= &amp;search= &amp;page= &amp;size= &amp;sort= — halaman default 10</small></span></li>
           <li><span class="verb">GET</span><span class="path">/api/products/{id}</span><span class="tag feign">FEIGN</span></li>
-          <li><span class="verb">PUT</span><span class="path">/api/products/{id}</span></li>
-          <li><span class="verb del">DELETE</span><span class="path">/api/products/{id}</span></li>
-          <li><span class="verb">POST</span><span class="path">/api/products/{id}/stock/reduce<small>?quantity= — dipanggil order-service saat checkout</small></span><span class="tag feign">FEIGN</span></li>
+          <li><span class="verb">PUT</span><span class="path">/api/products/{id}</span><span class="tag admin">ADMIN</span></li>
+          <li><span class="verb del">DELETE</span><span class="path">/api/products/{id}</span><span class="tag admin">ADMIN</span></li>
+          <li><span class="verb">POST</span><span class="path">/api/products/{id}/stock/reduce<small>?quantity= — hanya Feign dari order-service; gateway membalas 403 untuk panggilan dari luar</small></span><span class="tag feign">INTERNAL</span></li>
         </ul>
         <p class="svc-foot">Harga pakai <b>BigDecimal</b>, bukan double · stok habis melempar InsufficientStockException</p>
       </article>
@@ -573,8 +574,8 @@
         <ul class="routes">
           <li><span class="verb">POST</span><span class="path">/api/orders<small>Checkout — ambil produk, kurangi stok, simpan snapshot</small></span><span class="tag">X-USER-ID</span></li>
           <li><span class="verb">GET</span><span class="path">/api/orders<small>Riwayat milik sendiri, terbaru dulu</small></span><span class="tag">X-USER-ID</span></li>
-          <li><span class="verb">GET</span><span class="path">/api/orders/{id}</span></li>
-          <li><span class="verb">PATCH</span><span class="path">/api/orders/{id}/cancel<small>Hanya dari status PENDING</small></span></li>
+          <li><span class="verb">GET</span><span class="path">/api/orders/{id}<small>Hanya pesanan sendiri, kalau tidak 403</small></span><span class="tag">X-USER-ID</span></li>
+          <li><span class="verb">PATCH</span><span class="path">/api/orders/{id}/cancel<small>Hanya pesanan sendiri, dan hanya dari status PENDING</small></span><span class="tag">X-USER-ID</span></li>
         </ul>
         <p class="svc-foot">Enum <b>OrderStatus</b> — PENDING · PAID · CANCELLED</p>
       </article>

@@ -2,7 +2,7 @@
 
 Paket serah-terima untuk siapa pun yang akan membangun frontend ShopNest. Isinya tiga dokumen HTML yang berdiri sendiri — cukup dibuka lewat browser, tidak perlu server, tidak perlu build.
 
-Semua yang tertulis di dalamnya dibaca langsung dari kode di branch `dev` (commit `e7a5140`): entity JPA, controller, DTO, dan `docs/schema.sql`. Tidak ada yang dikarang dari rencana di atas kertas.
+Semua yang tertulis di dalamnya dibaca langsung dari kode di branch `dev` (terakhir disegarkan pada commit `2bf3924`): entity JPA, controller, DTO, dan `docs/schema.sql`. Tidak ada yang dikarang dari rencana di atas kertas.
 
 > **Catatan bahasa:** tiga dokumen ini dan halaman indeks ini ditulis dalam Bahasa Indonesia, berbeda dari `README.md` dan `ROADMAP.md` di repo yang berbahasa Inggris.
 
@@ -45,15 +45,16 @@ Tidak ada yang boleh menulis stok selain service itu. Frontend membaca stok untu
 
 ## Sebelum menyambung ke API asli
 
-Fase pertama berjalan dengan dummy data (MSW) dan tidak menyentuh backend sama sekali. Daftar ini baru relevan saat penyambungan — tapi baca sekarang, karena yang pertama adalah pemblokir mutlak.
+Fase pertama berjalan dengan dummy data (MSW) dan tidak menyentuh backend sama sekali. Daftar ini baru relevan saat penyambungan — tapi baca sekarang. Dua pemblokir terbesar sudah ditutup di backend; yang tersisa mengubah cara kamu menangani error.
 
-- [ ] **Tambahkan CORS di api-gateway.** Tidak ada konfigurasi CORS di mana pun pada repo ini. Postman tidak peduli CORS, jadi ini tidak pernah ketahuan; browser peduli, dan **setiap** request dari `localhost:5173` akan ditolak sebelum sampai ke gateway. Perbaikannya satu `CorsWebFilter`.
-- [ ] **Sadari bahwa order dan profil orang lain bisa dibaca.** `GET /api/orders/{id}` dan `GET/PUT /api/users/{userId}` tidak mencocokkan id di path dengan `X-User-Id`. Frontend tidak bisa menambal ini.
+- [x] ~~**Tambahkan CORS di api-gateway.**~~ **Sudah ada** — `CorsWebFilter` di `api-gateway/.../config/CorsConfig.java`. Yang tersisa untukmu: origin yang diizinkan diambil dari properti `shopnest.cors.allowed-origins` dan defaultnya hanya `http://localhost:5173`. Kalau Vite-mu di port lain, daftarkan — gejalanya kalau lupa identik dengan CORS yang belum ada.
+- [x] ~~**Order dan profil orang lain bisa dibaca.**~~ **Sudah ditutup** — tujuh endpoint (bukan tiga; `PATCH /cancel` dan endpoint alamat juga terdampak) kini mencocokkan id di path dengan `X-User-Id` dan membalas `403` kalau tidak cocok.
+- [ ] **Tangani `403` terpisah dari `401`.** Ini konsekuensi dua perbaikan di atas. `401` = sesi habis, hapus token dan lempar ke `/login`. `403` = tidak berhak, **jangan logout** — tampilkan pesan dan kembalikan ke halaman sebelumnya.
 - [ ] **Jangan buat tombol "Bayar".** Enum `PAID` ada, tapi tidak ada endpoint yang menuju ke sana — satu-satunya transisi yang terpasang adalah `/cancel`.
-- [ ] **Panel admin hanya disembunyikan, bukan diamankan.** `ProductController` tidak punya `@PreAuthorize`. Jangan tulis "terlindungi" di dokumen mana pun sampai guard-nya ada.
+- [ ] **Panel admin sekarang dijaga backend, tapi belum bisa diuji.** `ProductController` sudah memeriksa `X-User-Role` (`403` untuk non-ADMIN). Masalahnya pindah: registrasi selalu menghasilkan `USER` dan tidak ada endpoint untuk menaikkan role, jadi akun ADMIN harus dibuat lewat `UPDATE` di database.
 - [ ] **Tangani 401 sebagai "sesi habis".** Tidak ada refresh token; satu access token dengan masa berlaku dari `jwt.expiration`.
 
-Uraian lengkap keenam celah ada di **§1.8** pada `FRONTEND-BRIEF.html`.
+Uraian lengkap ketujuh celah — termasuk apa persisnya yang berubah pada dua yang sudah ditutup — ada di **§1.8** pada `FRONTEND-BRIEF.html`.
 
 ---
 
