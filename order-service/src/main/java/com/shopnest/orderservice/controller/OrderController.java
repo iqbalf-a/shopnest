@@ -30,8 +30,9 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<OrderResponse>> getOrder(@PathVariable UUID id) {
-        OrderResponse response = orderService.getOrderById(id);
+    public ResponseEntity<ApiResponse<OrderResponse>> getOrder(@RequestHeader("X-User-Id") UUID userId,
+                                                               @PathVariable UUID id) {
+        OrderResponse response = orderService.getOrderById(id, userId);
         return ResponseEntity.ok(ApiResponse.success("Order found", response));
     }
 
@@ -43,8 +44,9 @@ public class OrderController {
     }
 
     @PatchMapping("/{id}/cancel")
-    public ResponseEntity<ApiResponse<OrderResponse>> cancelOrder(@PathVariable UUID id) {
-        OrderResponse response = orderService.cancelOrder(id);
+    public ResponseEntity<ApiResponse<OrderResponse>> cancelOrder(@RequestHeader("X-User-Id") UUID userId,
+                                                                  @PathVariable UUID id) {
+        OrderResponse response = orderService.cancelOrder(id, userId);
         return ResponseEntity.ok(ApiResponse.success("Order cancelled", response));
     }
 }

@@ -10,9 +10,10 @@ public interface OrderService {
 
     OrderResponse createOrder(UUID userId, OrderRequest request);
 
-    OrderResponse getOrderById(UUID id);
+    // requesterId = pemilik sesi (dari token), dipakai untuk cek kepemilikan
+    OrderResponse getOrderById(UUID id, UUID requesterId);
 
     List<OrderResponse> getOrdersByUserId(UUID userId);
 
-    OrderResponse cancelOrder(UUID id);
+    OrderResponse cancelOrder(UUID id, UUID requesterId);
 }

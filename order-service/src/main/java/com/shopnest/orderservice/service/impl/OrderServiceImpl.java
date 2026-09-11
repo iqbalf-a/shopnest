@@ -9,6 +9,7 @@ import com.shopnest.orderservice.dto.response.OrderResponse;
 import com.shopnest.orderservice.entity.Order;
 import com.shopnest.orderservice.entity.OrderItem;
 import com.shopnest.orderservice.entity.OrderStatus;
+import com.shopnest.orderservice.exception.ForbiddenException;
 import com.shopnest.orderservice.exception.InvalidOrderStateException;
 import com.shopnest.orderservice.exception.OrderNotFoundException;
 import com.shopnest.orderservice.repository.OrderRepository;
@@ -81,8 +82,10 @@ public class OrderServiceImpl implements OrderService {
     // order.getItems() yang lazy (open-in-view sengaja dimatikan)
     @Override
     @Transactional
-    public OrderResponse getOrderById(UUID id) {
-        return toResponse(findOrderOrThrow(id));
+    public OrderResponse getOrderById(UUID id, UUID requesterId) {
+        Order order = findOrderOrThrow(id);
+        requireOwner(order, requesterId);
+        return toResponse(order);
     }
 
     @Override
@@ -95,8 +98,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderResponse cancelOrder(UUID id) {
+    public OrderResponse cancelOrder(UUID id, UUID requesterId) {
         Order order = findOrderOrThrow(id);
+        requireOwner(order, requesterId);
 
         if (order.getStatus() != OrderStatus.PENDING) {
             throw new InvalidOrderStateException(
@@ -107,6 +111,14 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
 
         return toResponse(order);
+    }
+
+    // Cek kepemilikan ditaruh di service, bukan controller: keputusannya butuh
+    // entity-nya dulu, dan untuk cancelOrder harus terjadi SEBELUM status diubah.
+    private void requireOwner(Order order, UUID requesterId) {
+        if (!order.getUserId().equals(requesterId)) {
+            throw new ForbiddenException("Order does not belong to the current user");
+        }
     }
 
     private Order findOrderOrThrow(UUID id) {

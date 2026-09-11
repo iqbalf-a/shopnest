@@ -8,6 +8,7 @@ import com.shopnest.orderservice.dto.request.OrderRequest;
 import com.shopnest.orderservice.dto.response.OrderResponse;
 import com.shopnest.orderservice.entity.Order;
 import com.shopnest.orderservice.entity.OrderStatus;
+import com.shopnest.orderservice.exception.ForbiddenException;
 import com.shopnest.orderservice.exception.InvalidOrderStateException;
 import com.shopnest.orderservice.repository.OrderRepository;
 import feign.FeignException;
@@ -117,16 +118,53 @@ class OrderServiceImplTest {
     @Test
     void cancelOrder_notPending_throwsInvalidOrderStateException() {
         UUID orderId = UUID.randomUUID();
+        UUID ownerId = UUID.randomUUID();
         Order order = Order.builder()
                 .id(orderId)
-                .userId(UUID.randomUUID())
+                .userId(ownerId)
                 .status(OrderStatus.CANCELLED)
                 .totalAmount(BigDecimal.ZERO)
                 .build();
 
         when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
 
-        assertThrows(InvalidOrderStateException.class, () -> orderService.cancelOrder(orderId));
+        // pemanggil = pemilik, jadi cek kepemilikan lolos dan tes ini tetap menguji status
+        assertThrows(InvalidOrderStateException.class, () -> orderService.cancelOrder(orderId, ownerId));
         verify(orderRepository, never()).save(any(Order.class));
+    }
+
+    @Test
+    void cancelOrder_notOwner_throwsForbiddenException() {
+        UUID orderId = UUID.randomUUID();
+        Order order = Order.builder()
+                .id(orderId)
+                .userId(UUID.randomUUID())
+                .status(OrderStatus.PENDING)   // PENDING: kalau cek pemilik tidak ada, ini akan sukses dibatalkan
+                .totalAmount(BigDecimal.ZERO)
+                .build();
+
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+
+        UUID attackerId = UUID.randomUUID();
+        assertThrows(ForbiddenException.class, () -> orderService.cancelOrder(orderId, attackerId));
+
+        assertEquals(OrderStatus.PENDING, order.getStatus());
+        verify(orderRepository, never()).save(any(Order.class));
+    }
+
+    @Test
+    void getOrderById_notOwner_throwsForbiddenException() {
+        UUID orderId = UUID.randomUUID();
+        Order order = Order.builder()
+                .id(orderId)
+                .userId(UUID.randomUUID())
+                .status(OrderStatus.PENDING)
+                .totalAmount(BigDecimal.ZERO)
+                .build();
+
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+
+        UUID attackerId = UUID.randomUUID();
+        assertThrows(ForbiddenException.class, () -> orderService.getOrderById(orderId, attackerId));
     }
 }
