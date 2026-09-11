@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
@@ -36,9 +37,23 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
             "/docs/specs/"
     );
 
+    // Path yang HANYA boleh dipanggil antar-service (Feign lewat Eureka, bukan lewat gateway).
+    // Token yang sah pun tidak cukup: endpoint ini tidak punya konsep pemilik,
+    // jadi siapa pun yang bisa menjangkaunya bisa mengubah stok tanpa membuat pesanan.
+    private static final List<String> INTERNAL_PATTERNS = List.of(
+            "/api/products/*/stock/**"
+    );
+
+    private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
+
+        // 0. Path internal → tolak dari luar, sebelum token bahkan diperiksa
+        if (INTERNAL_PATTERNS.stream().anyMatch(pattern -> PATH_MATCHER.match(pattern, path))) {
+            return deny(exchange, HttpStatus.FORBIDDEN, "Internal endpoint - not reachable through the gateway");
+        }
 
         // 1. Path publik → langsung teruskan (tapi buang header X-User-* palsu dari luar)
         if (PUBLIC_PATHS.stream().anyMatch(path::startsWith)) {
@@ -49,7 +64,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
         // scheme case-insensitive sesuai RFC 7235 (Bearer/bearer/BEARER sama saja)
         String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         if (authHeader == null || !authHeader.toLowerCase().startsWith("bearer ")) {
-            return unauthorized(exchange, "Missing or invalid Authorization header");
+            return deny(exchange, HttpStatus.UNAUTHORIZED, "Missing or invalid Authorization header");
         }
 
         // 3. Verifikasi signature + expiry token
@@ -72,7 +87,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
             return chain.filter(exchange.mutate().request(mutated).build());
 
         } catch (JwtException e) {
-            return unauthorized(exchange, "Invalid or expired token");
+            return deny(exchange, HttpStatus.UNAUTHORIZED, "Invalid or expired token");
         }
     }
 
@@ -88,9 +103,9 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
         return exchange.mutate().request(mutated).build();
     }
 
-    private Mono<Void> unauthorized(ServerWebExchange exchange, String message) {
+    private Mono<Void> deny(ServerWebExchange exchange, HttpStatus status, String message) {
         ServerHttpResponse response = exchange.getResponse();
-        response.setStatusCode(HttpStatus.UNAUTHORIZED);
+        response.setStatusCode(status);
         response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
         String body = "{\"success\":false,\"message\":\"" + message + "\",\"data\":null}";
         DataBuffer buffer = response.bufferFactory().wrap(body.getBytes(StandardCharsets.UTF_8));
