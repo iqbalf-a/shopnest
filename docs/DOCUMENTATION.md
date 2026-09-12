@@ -34,7 +34,10 @@ ShopNest memecah aplikasi e-commerce menjadi beberapa service kecil yang berdiri
 
 ## 3. Arsitektur
 
-Diagram: lihat `docs/ecommerce_microservices_architecture.png`
+Tabel di bawah ini adalah sumber yang akurat. Ada juga
+[`ecommerce_microservices_architecture.png`](ecommerce_microservices_architecture.png) di folder ini,
+tapi itu **diagram rencana awal** — beberapa komponen di sana (Redis, Zipkin, circuit breaker, 4 DB terpisah)
+tidak jadi dibangun. Daftar selisihnya ada di [`README.md`](README.md#catatan-soal-diagram-png) folder ini.
 
 | Service | Port | Tanggung jawab | Status |
 |---------|------|----------------|--------|

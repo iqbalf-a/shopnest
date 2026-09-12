@@ -143,6 +143,7 @@ This project runs locally only — public deployment was attempted and paused af
 
 | Doc | What's in it |
 |---|---|
+| [`docs/README.md`](docs/README.md) | **Start here** — index of every doc, with reading orders for different goals |
 | [`docs/DOCUMENTATION.md`](docs/DOCUMENTATION.md) | Full architecture, request flows, endpoint list, folder structure |
 | [`docs/ROADMAP.md`](docs/ROADMAP.md) | Build phases, what's done, what's deliberately skipped |
 | [`docs/DOCKER-NOTES.md`](docs/DOCKER-NOTES.md) / [`docs/DOCKER-STEPS.md`](docs/DOCKER-STEPS.md) | Docker concepts + step-by-step containerization runbook |
