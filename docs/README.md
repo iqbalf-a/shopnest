@@ -15,6 +15,7 @@ Tergantung tujuanmu:
 | **Paham sistemnya** | [DOCUMENTATION](DOCUMENTATION.md) → [ROADMAP](ROADMAP.md) |
 | **Menulis kode / menambah service** | [BUILD-ORDER](BUILD-ORDER.md) → [DOCUMENTATION](DOCUMENTATION.md) → [TESTING-NOTES](TESTING-NOTES.md) |
 | **Membangun frontend-nya** | [FRONTEND-README](FRONTEND-README.md) — paket serah-terima tersendiri, punya urutan baca sendiri |
+| **Mendesain antarmukanya** | [DESIGN-HANDOVER](DESIGN-HANDOVER.md) — brief siap pakai untuk Claude Design |
 | **Bersiap wawancara** | [INTERVIEW-QA](INTERVIEW-QA.md) → [ROADMAP](ROADMAP.md) bagian penyederhanaan |
 | **Mengurus Docker** | [DOCKER-NOTES](DOCKER-NOTES.md) → [DOCKER-STEPS](DOCKER-STEPS.md) |
 
@@ -49,6 +50,7 @@ Audiensnya berbeda: developer yang akan membangun `shopnest-frontend` di repo te
 | [`FRONTEND-PRODUCT-STORY.html`](FRONTEND-PRODUCT-STORY.html) | Latar produk: satu toko, bukan marketplace — beserta buktinya di skema |
 | [`FRONTEND-SERVICE-ATLAS.html`](FRONTEND-SERVICE-ATLAS.html) | ERD 6 tabel, peta service, 19 endpoint beserta hak aksesnya |
 | [`FRONTEND-BRIEF.html`](FRONTEND-BRIEF.html) | PRD + design system lengkap |
+| [`DESIGN-HANDOVER.md`](DESIGN-HANDOVER.md) | Brief untuk Claude Design — vertikal furniture, masalah "tanpa foto produk", 10 layar beserta keadaan kosong/memuat/gagal |
 
 ### Aset
 
