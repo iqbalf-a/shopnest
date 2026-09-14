@@ -12,3 +12,8 @@ spring-starter/
 # IDE
 **/.idea/
 **/*.iml
+# Frontend
+node_modules/
+dist/
+.vite/
+*.local

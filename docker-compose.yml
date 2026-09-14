@@ -21,7 +21,7 @@ services:
       retries: 5
 
   eureka-server:
-    build: ./eureka-server               # build dari Dockerfile di folder itu
+    build: ./backend/eureka-server               # build dari Dockerfile di folder itu
     container_name: shopnest-eureka
     restart: unless-stopped
     ports:
@@ -30,7 +30,7 @@ services:
       - shopnest-network
 
   auth-service:
-    build: ./auth-service
+    build: ./backend/auth-service
     container_name: shopnest-auth
     restart: unless-stopped
     environment:
@@ -49,7 +49,7 @@ services:
       - shopnest-network
 
   user-service:
-    build: ./user-service
+    build: ./backend/user-service
     container_name: shopnest-user
     restart: unless-stopped
     environment:
@@ -67,7 +67,7 @@ services:
       - shopnest-network
 
   product-service:
-    build: ./product-service
+    build: ./backend/product-service
     container_name: shopnest-product
     restart: unless-stopped
     environment:
@@ -85,7 +85,7 @@ services:
       - shopnest-network
 
   order-service:
-    build: ./order-service
+    build: ./backend/order-service
     container_name: shopnest-order
     restart: unless-stopped
     environment:
@@ -103,7 +103,7 @@ services:
       - shopnest-network
 
   api-gateway:
-    build: ./api-gateway
+    build: ./backend/api-gateway
     container_name: shopnest-gateway
     restart: unless-stopped
     ports:

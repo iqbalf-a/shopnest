@@ -107,7 +107,7 @@ Each service can also run individually via `./mvnw spring-boot:run` against your
 ## Testing
 
 ```bash
-cd auth-service && ./mvnw test    # repeat per service
+cd backend/auth-service && ./mvnw test    # repeat per service
 ```
 
 Unit tests cover the service layer (business logic) for all 4 services — happy paths plus error cases (not-found, conflict, invalid state), including Feign 404/409 propagation in order-service. Controller/repository/integration tests are intentionally out of scope for now.

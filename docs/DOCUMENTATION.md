@@ -176,7 +176,7 @@ Setiap service: copy `application.properties.example` → `application.propertie
 
 Urutan start (penting: Eureka dulu):
 ```
-1. eureka-server   (8761)   cd eureka-server   && ./mvnw spring-boot:run
+1. eureka-server   (8761)   cd backend/eureka-server && ./mvnw spring-boot:run
 2. auth-service    (8081)
 3. user-service    (8082)
 4. product-service (8083)
@@ -250,7 +250,7 @@ Ini penting untuk wawancara — menunjukkan kamu paham trade-off, bukan sekadar 
 ## 9. Struktur Folder (per service, konsisten)
 
 ```
-<service>/src/main/java/com/shopnest/<service>/
+backend/<service>/src/main/java/com/shopnest/<service>/
 ├── config/          @EnableJpaAuditing dll.
 ├── controller/      REST endpoint (@RestController)
 ├── dto/
